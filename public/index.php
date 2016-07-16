@@ -156,6 +156,25 @@ $app->group("/resources", function () use ($app) {
         fclose($fp);
     })->name("/resources/x/download");
 
+    $app->get("/:resource/author", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", 'author.$id'));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", 'author.$id'));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $cursor = authors()->find(array("_id" => $resource['author']['$id']));
+        $author = dbToJson($cursor);
+
+        echoData($author);
+    });
+
     $app->get("/:resource/versions", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
