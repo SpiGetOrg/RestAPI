@@ -18,6 +18,27 @@ $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"] = array(
     "releaseDate",
     "updateDate",
     "downloads");
+$GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = array(
+    "_id",
+    "name",
+    "tag",
+    "contributors",
+    "external",
+    "file",
+    "description",
+    "likes",
+    "testedVersions",
+    "version",
+    "versions",
+    "updates",
+    "links",
+    "author",
+    "category",
+    "rating",
+    "releaseDate",
+    "updateDate",
+    "downloads"
+);
 
 
 $app = new Slim\Slim();
@@ -66,14 +87,14 @@ $app->hook("slim.before.dispatch", function () use ($app) {
 $app->group("/resources", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array(), $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"]));
+        $cursor = paginate($app->request(), resources()->find(array(), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor);
 
         echoData($resources);
     })->name("/resources");
 
     $app->get("/new", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate"), $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"]));
+        $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate"), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor);
 
         echoData($resources);
@@ -126,11 +147,11 @@ $app->group("/resources", function () use ($app) {
         fclose($fp);
     })->name("/resources/x/download");
 
-    $app->get("/:resource", function ($resource) {
+    $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
-            $cursor = resources()->find(array("_id" => (int)$resource));
-        }else{
-            $cursor = resources()->find(array("name" => $resource));
+            $cursor = resources()->find(array("_id" => (int)$resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
         }
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
@@ -154,6 +175,32 @@ function paginate($request, $cursor) {
     $sort = $request->params("sort", "id");
     if ($sort == "id") $sort = "_id";
     return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort));
+}
+
+function selectFields($allowed, $request, $default = null) {
+    $paramFields = $request->params("fields");
+    if (!isset($paramFields)) {
+        if (!is_null($default)) {
+            return $default;
+        } else {
+            return $allowed;
+        }
+    } else {
+        $paramFields = preg_split("/\\,/i", $paramFields);
+    }
+    $fields = $allowed;
+    foreach ($allowed as $field) {
+        if ("_id" === $field) {
+            continue;
+        } else {
+            if (!in_array($field, $paramFields)) {
+                if (($key = array_search($field, $fields)) !== false) {
+                    unset($fields[$key]);
+                }
+            }
+        }
+    }
+    return $fields;
 }
 
 function dbToJson($cursor) {
