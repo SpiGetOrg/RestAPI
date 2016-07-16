@@ -208,6 +208,25 @@ $app->group("/categories", function () use ($app) {
         echoData($categories);
     })->name("/categories");
 
+    $app->get("/:category/resources", function ($category) use ($app) {
+        if (is_numeric($category)) {
+            $cursor = categories()->find(array("_id" => (int)$category), array("_id"));
+        } else {
+            $cursor = categories()->find(array("name" => $category), array("_id"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "category not found"), 404);
+            return;
+        }
+        $category = dbToJson($cursor);
+
+        $cursor = paginate($app->request(), resources()->find(array('category.$id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor);
+
+        echoData($resources);
+    });
+
     $app->get("/:category", function ($category) use ($app) {
         if (is_numeric($category)) {
             $cursor = categories()->find(array("_id" => (int)$category));
