@@ -125,6 +125,23 @@ $app->group("/resources", function () use ($app) {
         fpassthru($fp);
         fclose($fp);
     })->name("/resources/x/download");
+
+    $app->get("/:resource", function ($resource) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource));
+        }else{
+            $cursor = resources()->find(array("name" => $resource));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        echoData($resource);
+    });
+
 });
 
 
