@@ -68,6 +68,7 @@ $app->group("/resources", function () use ($app) {
 
         echoData($resources);
     })->name("/resources");
+
     $app->get("/new", function () use ($app) {
         $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate")));
         $resources = dbToJson($cursor);
@@ -75,6 +76,21 @@ $app->group("/resources", function () use ($app) {
         echoData($resources);
     })->name("/resources/new");
 
+    $app->get("/for/:versions(/:method)", function ($versions = "", $method = "any") use ($app) {
+        $versionArray = preg_split("/\\,/i", $versions);
+        if ($method === "any") {
+            $cursor = resources()->find(array("testedVersions" => array('$exists' => true, '$in' => $versionArray)), array("id", "name", "testedVersions"));
+        } else if ($method === "all") {
+            $cursor = resources()->find(array("testedVersions" => array('$exists' => true, '$all' => $versionArray)), array("id", "name", "testedVersions"));
+        } else {
+            echoData(array("error" => "Unknown method. Allowed: any, all"), 400);
+            return;
+        }
+        $cursor = paginate($app->request(), $cursor);
+        $resources = dbToJson($cursor);
+
+        echoData(array("check" => $versionArray, "method" => $method, "match" => $resources));
+    })->name("/resources/for");
 });
 
 
