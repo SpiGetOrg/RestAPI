@@ -161,9 +161,10 @@ $app->group("/resources", function () use ($app) {
         $resource = dbToJson($cursor);
 
         echoData($resource);
-    });
+    })->name("/resources/x");
 
 });
+
 
 
 // Run!
