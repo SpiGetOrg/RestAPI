@@ -179,6 +179,29 @@ $app->group("/resources", function () use ($app) {
         echoData($versions, true);
     });
 
+    $app->get("/:resource/updates", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "updates"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "updates"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $updateIds = array();
+        foreach ($resource["updates"] as $up) {
+            $updateIds[] = $up['$id'];
+        }
+        $cursor = paginate($app->request(), resource_updates()->find(array('_id' => array('$in' => $updateIds))));
+        $updates = dbToJson($cursor);
+
+        echoData($updates, true);
+    });
+
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
