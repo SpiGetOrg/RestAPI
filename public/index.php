@@ -97,14 +97,14 @@ $app->group("/resources", function () use ($app) {
 
     $app->get("/", function () use ($app) {
         $cursor = paginate($app->request(), resources()->find(array(), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/resources");
 
     $app->get("/new", function () use ($app) {
         $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate"), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/resources/new");
@@ -120,7 +120,7 @@ $app->group("/resources", function () use ($app) {
             return;
         }
         $cursor = paginate($app->request(), $cursor);
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData(array("check" => $versionArray, "method" => $method, "match" => $resources));
     })->name("/resources/for");
@@ -177,7 +177,7 @@ $app->group("/authors", function () use ($app) {
 
     $app->get("/", function () use ($app) {
         $cursor = paginate($app->request(), authors()->find(array(), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
-        $authors = dbToJson($cursor);
+        $authors = dbToJson($cursor, true);
 
         echoData($authors);
     })->name("/authors");
@@ -196,7 +196,7 @@ $app->group("/authors", function () use ($app) {
         $author = dbToJson($cursor);
 
         $cursor = paginate($app->request(), resources()->find(array('author.$id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/authors/x/resources");
@@ -222,7 +222,7 @@ $app->group("/categories", function () use ($app) {
 
     $app->get("/", function () use ($app) {
         $cursor = paginate($app->request, categories()->find());
-        $categories = dbToJson($cursor);
+        $categories = dbToJson($cursor, true);
 
         echoData($categories);
     })->name("/categories");
@@ -241,7 +241,7 @@ $app->group("/categories", function () use ($app) {
         $category = dbToJson($cursor);
 
         $cursor = paginate($app->request(), resources()->find(array('category.$id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/categories/x/resources");
@@ -302,7 +302,7 @@ function selectFields($allowed, $request, $default = null) {
     return $fields;
 }
 
-function dbToJson($cursor) {
+function dbToJson($cursor, $forceArray = false) {
     $isArray = $cursor->count() > 1;
     $json = array();
     foreach ($cursor as $k => $row) {
@@ -311,7 +311,7 @@ function dbToJson($cursor) {
             $row["id"] = $row["_id"];
             unset($row["_id"]);
         }
-        if ($isArray) {
+        if ($isArray || $forceArray) {
             $json [] = $row;
         } else {
             return $row;
