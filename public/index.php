@@ -39,6 +39,15 @@ $GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = array(
     "updateDate",
     "downloads"
 );
+$GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"] = array(
+    "_id",
+    "name"
+);
+$GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"] = array(
+    "_id",
+    "name",
+    "icon"
+);
 
 
 $app = new Slim\Slim();
@@ -164,7 +173,16 @@ $app->group("/resources", function () use ($app) {
     })->name("/resources/x");
 
 });
+$app->group("/authors", function () use ($app) {
 
+    $app->get("/", function () use ($app) {
+        $cursor = paginate($app->request(), authors()->find(array(), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
+        $authors = dbToJson($cursor);
+
+        echoData($authors);
+    })->name("/authors");
+
+});
 
 
 // Run!
