@@ -2,6 +2,24 @@
 include("../internal/Slim.php");
 include("../internal/Database.php");
 
+$GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"] = array(
+    "_id",
+    "name",
+    "tag",
+    "contributors",
+    "likes",
+    "file",
+    "testedVersions",
+    "links",
+    "version",
+    "author",
+    "category",
+    "rating",
+    "releaseDate",
+    "updateDate",
+    "downloads");
+
+
 $app = new Slim\Slim();
 $app->notFound(function () use ($app) {
     echoData(array("error" => "invalid route"));
@@ -48,29 +66,14 @@ $app->hook("slim.before.dispatch", function () use ($app) {
 $app->group("/resources", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array(), array(
-            "_id",
-            "name",
-            "tag",
-            "contributors",
-            "likes",
-            "file",
-            "testedVersions",
-            "links",
-            "version",
-            "author",
-            "category",
-            "rating",
-            "releaseDate",
-            "updateDate",
-            "downloads")));
+        $cursor = paginate($app->request(), resources()->find(array(), $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"]));
         $resources = dbToJson($cursor);
 
         echoData($resources);
     })->name("/resources");
 
     $app->get("/new", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate")));
+        $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate"), $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"]));
         $resources = dbToJson($cursor);
 
         echoData($resources);
