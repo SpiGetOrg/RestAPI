@@ -94,6 +94,37 @@ $app->group("/resources", function () use ($app) {
 
         echoData(array("check" => $versionArray, "method" => $method, "match" => $resources));
     })->name("/resources/for");
+
+    $app->get("/:resource/download", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "name", "file"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "name", "file"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $file = makeDownloadFile($resource["id"], $resource["file"]["type"]);
+        if (!file_exists($file)) {
+            echoData(array("error" => "file not found"), 404);
+            return;
+        }
+
+        $file_name = $resource["name"] . "#" . $resource["id"] . $resource["file"]["type"];
+        $file_type = mime_content_type($file);
+        if (empty($file_type)) $file_type = "application/octet-stream";
+
+        $fp = fopen($file, 'rb');
+        header("Content-Type: $file_type");
+        header("Content-Disposition: attachment; filename=$file_name");
+        header("Content-Length: " . filesize($file));
+        fpassthru($fp);
+        fclose($fp);
+    })->name("/resources/x/download");
 });
 
 
@@ -126,6 +157,19 @@ function dbToJson($cursor) {
 
 
     return $json;
+}
+
+function makeDownloadFile($resource, $type = ".jar") {
+    $resource = (string)$resource;
+    $split = str_split($resource);
+
+    $finalFolder = "/home/spiget/resources/download/";
+    for ($i = 0; $i < count($split) - 1; $i++) {
+        $s = $split [$i];
+        $finalFolder .= $s . "/";
+    }
+
+    return $finalFolder . $resource . $type;
 }
 
 
