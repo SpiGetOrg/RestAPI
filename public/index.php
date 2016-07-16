@@ -67,13 +67,13 @@ $app->group("/resources", function () use ($app) {
         $resources = dbToJson($cursor);
 
         echoData($resources);
-    });
+    })->name("/resources");
     $app->get("/new", function () use ($app) {
         $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate")));
         $resources = dbToJson($cursor);
 
         echoData($resources);
-    });
+    })->name("/resources/new");
 
 });
 
