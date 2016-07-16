@@ -182,7 +182,7 @@ $app->group("/authors", function () use ($app) {
         echoData($authors);
     })->name("/authors");
 
-    $app->get("/:author/resources", function ($author) use ($app){
+    $app->get("/:author/resources", function ($author) use ($app) {
         if (is_numeric($author)) {
             $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
         } else {
@@ -199,7 +199,7 @@ $app->group("/authors", function () use ($app) {
         $resources = dbToJson($cursor);
 
         echoData($resources);
-    });
+    })->name("/authors/x/resources");
 
     $app->get("/:author", function ($author) use ($app) {
         if (is_numeric($author)) {
@@ -244,7 +244,7 @@ $app->group("/categories", function () use ($app) {
         $resources = dbToJson($cursor);
 
         echoData($resources);
-    });
+    })->name("/categories/x/resources");
 
     $app->get("/:category", function ($category) use ($app) {
         if (is_numeric($category)) {
