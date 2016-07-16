@@ -156,6 +156,29 @@ $app->group("/resources", function () use ($app) {
         fclose($fp);
     })->name("/resources/x/download");
 
+    $app->get("/:resource/versions", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "versions"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $versionIds = array();
+        foreach ($resource["versions"] as $ver) {
+            $versionIds[] = $ver['$id'];
+        }
+        $cursor = paginate($app->request(), resource_versions()->find(array('_id' => array('$in' => $versionIds))));
+        $versions = dbToJson($cursor);
+
+        echoData($versions, true);
+    });
+
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
@@ -379,6 +402,16 @@ function echoData($json, $status = 0) {
 function resources() {
     $db = db();
     return $db->resources;
+}
+
+function resource_versions() {
+    $db = db();
+    return $db->resource_versions;
+}
+
+function resource_updates() {
+    $db = db();
+    return $db->resource_updates;
 }
 
 function authors() {
