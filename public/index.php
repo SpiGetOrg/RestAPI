@@ -182,6 +182,25 @@ $app->group("/authors", function () use ($app) {
         echoData($authors);
     })->name("/authors");
 
+    $app->get("/:author/resources", function ($author) use ($app){
+        if (is_numeric($author)) {
+            $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+        } else {
+            $cursor = authors()->find(array("name" => $author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "author not found"), 404);
+            return;
+        }
+        $author = dbToJson($cursor);
+
+        $cursor = paginate($app->request(), resources()->find(array('author.$id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor);
+
+        echoData($resources);
+    });
+
     $app->get("/:author", function ($author) use ($app) {
         if (is_numeric($author)) {
             $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
