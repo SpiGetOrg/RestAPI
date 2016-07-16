@@ -173,7 +173,7 @@ $app->group("/resources", function () use ($app) {
         $author = dbToJson($cursor);
 
         echoData($author);
-    });
+    })->name("/resources/x/author");
 
     $app->get("/:resource/versions", function ($resource) use ($app) {
         if (is_numeric($resource)) {
@@ -196,7 +196,7 @@ $app->group("/resources", function () use ($app) {
         $versions = dbToJson($cursor);
 
         echoData($versions, true);
-    });
+    })->name("/resources/x/versions");
 
     $app->get("/:resource/updates", function ($resource) use ($app) {
         if (is_numeric($resource)) {
@@ -219,7 +219,7 @@ $app->group("/resources", function () use ($app) {
         $updates = dbToJson($cursor);
 
         echoData($updates, true);
-    });
+    })->name("/resources/x/updates");
 
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
