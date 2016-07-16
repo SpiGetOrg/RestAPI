@@ -110,7 +110,8 @@ $app->group("/resources", function () use ($app) {
         echoData($resources);
     })->name("/resources/new");
 
-    $app->get("/for/:versions(/:method)", function ($versions = "", $method = "any") use ($app) {
+    $app->get("/for/:versions", function ($versions = "") use ($app) {
+        $method = $app->request()->params("method", "any");
         $versionArray = preg_split("/\\,/i", $versions);
         if ($method === "any") {
             $cursor = resources()->find(array("testedVersions" => array('$exists' => true, '$in' => $versionArray)), array("id", "name", "testedVersions"));
