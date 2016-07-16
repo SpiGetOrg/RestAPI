@@ -196,7 +196,7 @@ $app->group("/authors", function () use ($app) {
         $author = dbToJson($cursor);
 
         echoData($author);
-    });
+    })->name("/authors/x");
 
 });
 $app->group("/categories", function () use ($app) {
@@ -206,7 +206,7 @@ $app->group("/categories", function () use ($app) {
         $categories = dbToJson($cursor);
 
         echoData($categories);
-    });
+    })->name("/categories");
 
     $app->get("/:category", function ($category) use ($app) {
         if (is_numeric($category)) {
@@ -222,7 +222,7 @@ $app->group("/categories", function () use ($app) {
         $category = dbToJson($cursor);
 
         echoData($category);
-    });
+    })->name("/categories/x");
 
 });
 
