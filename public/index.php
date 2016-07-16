@@ -199,6 +199,32 @@ $app->group("/authors", function () use ($app) {
     });
 
 });
+$app->group("/categories", function () use ($app) {
+
+    $app->get("/", function () use ($app) {
+        $cursor = paginate($app->request, categories()->find());
+        $categories = dbToJson($cursor);
+
+        echoData($categories);
+    });
+
+    $app->get("/:category", function ($category) use ($app) {
+        if (is_numeric($category)) {
+            $cursor = categories()->find(array("_id" => (int)$category));
+        } else {
+            $cursor = categories()->find(array("name" => $category));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "category not found"), 404);
+            return;
+        }
+        $category = dbToJson($cursor);
+
+        echoData($category);
+    });
+
+});
 
 
 // Run!
