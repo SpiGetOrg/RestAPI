@@ -12,8 +12,12 @@ function db() {
     if (!is_null($user) && !is_null($pass)) {
         $auth = "$user:$pass@";
     }
-    $mongo = new MongoClient ("mongodb://$auth$host:$port/$login_db");
-    $db = $mongo->selectDB($database);
+    try {
+        $mongo = new MongoClient ("mongodb://$auth$host:$port/$login_db");
+        $db = $mongo->selectDB($database);
+    } catch (Exception $e) {
+        exit("Database connection failed");
+    }
 
     unset ($json);
     unset ($user);
