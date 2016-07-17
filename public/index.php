@@ -418,7 +418,7 @@ function echoData($json, $status = 0) {
     $app->response()->header("X-Api-Time", time());
     $app->response()->header("Cache-Control", "public, max-age=3600, s-maxage=3600" /* 2 Hours Cache */);
     $app->response()->header("Expires", gmdate('D, d M Y H:i:s', strtotime('+1 hour')) . " GMT");
-    //$app->response()->header("Last-Modified", gmdate("D, d M Y H:i:s", getDBStats() ["fetcher"] ["start"]));
+    $app->response()->header("Last-Modified", gmdate("D, d M Y H:i:s", (getStatus("fetch.start") / 1000)));
     $app->response()->header("Connection: close");
 
     $paramPretty = $app->request()->params("pretty");
@@ -450,6 +450,18 @@ function echoData($json, $status = 0) {
     }
 }
 
+function getStatus($key) {
+    $cursor = status()->find(array("key" => $key), array("value"))->limit(1);
+    if ($cursor->count() <= 0) {
+        return null;
+    }
+    $value = dbToJson($cursor)["value"];
+    if ($value instanceof MongoInt64 || $value instanceof MongoInt32) {
+        return $value->value;
+    }
+    return $value;
+}
+
 //** Database **//
 
 function resources() {
@@ -472,9 +484,9 @@ function authors() {
     return $db->authors;
 }
 
-function stats() {
+function status() {
     $db = db();
-    return $db->stats;
+    return $db->status;
 }
 
 function categories() {
