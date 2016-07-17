@@ -97,14 +97,14 @@ $app->hook("slim.before.dispatch", function () use ($app) {
 $app->group("/resources", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array(), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array(), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/resources");
 
     $app->get("/new", function () use ($app) {
-        $cursor = paginate($app->request(), resources()->find(array('$where' => "this.releaseDate == this.updateDate"), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array('$where' => "this.releaseDate == this.updateDate"), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
@@ -121,7 +121,7 @@ $app->group("/resources", function () use ($app) {
             echoData(array("error" => "Unknown method. Allowed: any, all"), 400);
             return;
         }
-        $cursor = paginate($app->request(), $cursor);
+        $cursor = paginate($app, $cursor);
         $resources = dbToJson($cursor, true);
 
         echoData(array("check" => $versionArray, "method" => $method, "match" => $resources));
@@ -194,7 +194,7 @@ $app->group("/resources", function () use ($app) {
         foreach ($resource["versions"] as $ver) {
             $versionIds[] = $ver['$id'];
         }
-        $cursor = paginate($app->request(), resource_versions()->find(array('_id' => array('$in' => $versionIds))));
+        $cursor = paginate($app, resource_versions()->find(array('_id' => array('$in' => $versionIds))));
         $versions = dbToJson($cursor);
 
         echoData($versions, true);
@@ -217,7 +217,7 @@ $app->group("/resources", function () use ($app) {
         foreach ($resource["updates"] as $up) {
             $updateIds[] = $up['$id'];
         }
-        $cursor = paginate($app->request(), resource_updates()->find(array('_id' => array('$in' => $updateIds))));
+        $cursor = paginate($app, resource_updates()->find(array('_id' => array('$in' => $updateIds))));
         $updates = dbToJson($cursor);
 
         echoData($updates, true);
@@ -243,7 +243,7 @@ $app->group("/resources", function () use ($app) {
 $app->group("/authors", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app->request(), authors()->find(array(), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, authors()->find(array(), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
         $authors = dbToJson($cursor, true);
 
         echoData($authors);
@@ -262,7 +262,7 @@ $app->group("/authors", function () use ($app) {
         }
         $author = dbToJson($cursor);
 
-        $cursor = paginate($app->request(), resources()->find(array('author.$id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array('author.$id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
@@ -307,7 +307,7 @@ $app->group("/categories", function () use ($app) {
         }
         $category = dbToJson($cursor);
 
-        $cursor = paginate($app->request(), resources()->find(array('category.$id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array('category.$id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
@@ -335,11 +335,20 @@ $app->group("/categories", function () use ($app) {
 // Run!
 $app->run();
 
-function paginate($request, $cursor) {
-    $size = (int)$request->params("size", 10);
-    $page = (int)$request->params("page", 1);
+function paginate($app, $cursor) {
+    $request = $app->request();
+    $response = $app->response();
+
+    $size = max((int)$request->params("size", 10), 1);
+    $page = max((int)$request->params("page", 1), 1);
     $sort = $request->params("sort", "id");
     if ($sort == "id") $sort = "_id";
+
+    $response->headers->set("X-Page-Size", "$size");
+    $response->headers->set("X-Page-Index", "$page");
+    $count = $cursor->count() / $size;
+    $response->headers->set("X-Page-Count", "$count");
+
     return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort));
 }
 
