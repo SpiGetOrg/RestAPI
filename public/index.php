@@ -38,7 +38,8 @@ $GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = array(
     "releaseDate",
     "updateDate",
     "downloads",
-    "icon"
+    "icon",
+    "reviews"
 );
 $GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"] = array(
     "_id",
@@ -92,6 +93,10 @@ $app->hook("slim.before.dispatch", function () use ($app) {
             "writeConcern" => 0
         ));
     }
+});
+
+$app->get("/status", function () use ($app) {
+
 });
 
 $app->group("/resources", function () use ($app) {
