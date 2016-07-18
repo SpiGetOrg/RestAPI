@@ -365,7 +365,7 @@ $app->group("/webhook", function () use ($app) {
             "new-resource",
             "resource-update",
             "new-author");
-        echoData($webhookEvents);
+        echoData(array("events" => $webhookEvents));
     })->name("/webhook/events");
 
     $app->post("/register", function () use ($app) {
