@@ -410,7 +410,7 @@ $app->group("/webhook", function () use ($app) {
         $id = hash("sha256", ($url . "_" . json_encode($events) . "_" . $app->request()->getIp() . "_" . time()), false);
         $secret = hash("sha512", $salt . $id . $salt . uniqid() . time() . $salt);
         $webhooks->insert(array(
-            "id" => $id,
+            "_id" => $id,
             "url" => $url,
             "events" => $events,
             "secret" => $secret,
@@ -432,14 +432,14 @@ $app->group("/webhook", function () use ($app) {
         $webhooks = webhooks();
 
         // Check if the ID exists first
-        $document = $webhooks->find(array("id" => $id), array("id"));
+        $document = $webhooks->find(array("_id" => $id), array("id"));
         if ($document->count() <= 0) {
             echoData(array("error" => "webhook not found"), 404);
             return;
         }
 
         // Then check the secret
-        $document = $webhooks->find(array("id" => $id, "secret" => $secret), array("id"));
+        $document = $webhooks->find(array("_id" => $id, "secret" => $secret), array("id"));
         if ($document->count() <= 0) {
             echoData(array("error" => "Invalid secret"), 403);
             return;
@@ -447,7 +447,7 @@ $app->group("/webhook", function () use ($app) {
 
         // Finally remove if everything matches
         $webhooks->remove(array(
-            "id" => $id,
+            "_id" => $id,
             "secret" => $secret
         ));
         echoData(array("success" => true));
