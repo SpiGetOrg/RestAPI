@@ -79,7 +79,7 @@ $app->hook("slim.before.dispatch", function () use ($app) {
         $hour = intval(date("H"));
 
         $method = $app->request()->getMethod();
-        $path = $app->router()->getCurrentRoute()->getName();
+        $path = "/v2" . $app->router()->getCurrentRoute()->getName();
         $ip = $app->request()->getIp();
 
         requests()->update(array(
