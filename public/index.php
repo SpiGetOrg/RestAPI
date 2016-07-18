@@ -443,7 +443,7 @@ $app->group("/webhook", function () use ($app) {
             "status" => $webhook["failStatus"],
             "failedConnections" => $webhook["failedConnections"]
         ));
-    });
+    })->name("/webhook/status");
 
 
     $app->delete("/delete/:id/:secret", function ($id, $secret) use ($app) {
