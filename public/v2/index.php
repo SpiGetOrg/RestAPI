@@ -316,7 +316,7 @@ $app->group("/authors", function () use ($app) {
 $app->group("/categories", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app->request, categories()->find());
+        $cursor = paginate($app, categories()->find());
         $categories = dbToJson($cursor, true);
 
         echoData($categories);
