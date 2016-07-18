@@ -120,7 +120,7 @@ $app->get("/status", function () use ($app) {
     );
 
     echoData(array("status" => $status, "stats" => $stats));
-});
+})->name("/status");
 
 $app->group("/resources", function () use ($app) {
 
