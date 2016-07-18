@@ -1,6 +1,6 @@
 <?php
-include("../internal/Slim.php");
-include("../internal/Database.php");
+include("../../internal/Slim.php");
+include("../../internal/Database.php");
 
 $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"] = array(
     "_id",
@@ -122,7 +122,7 @@ $app->get("/status", function () use ($app) {
     echoData(array("status" => $status, "stats" => $stats));
 });
 
-$app->group("/resources", function () use ($app) {
+$app->group("/resources/", function () use ($app) {
 
     $app->get("/", function () use ($app) {
         $cursor = paginate($app, resources()->find(array(), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
