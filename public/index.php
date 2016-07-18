@@ -358,6 +358,102 @@ $app->group("/categories", function () use ($app) {
     })->name("/categories/x");
 
 });
+$app->group("/webhook", function () use ($app) {
+
+    $app->get("/events", function () use ($app) {
+        $webhookEvents = array(
+            "new-resource",
+            "resource-update",
+            "new-author");
+        echoData($webhookEvents);
+    })->name("/webhook/events");
+
+    $app->post("/register", function () use ($app) {
+        $url = $app->request()->post("url");
+        $events = $app->request()->post("events", "[]");
+        $events = json_decode($events, true);
+        $salt = $app->request()->post("salt", hash("sha256", uniqid(), false));
+
+        $webhookEvents = array(
+            "new-resource",
+            "resource-update",
+            "new-author");
+
+        if (empty($url)) {
+            echoData(array("error" => "missing url"), 400);
+            return;
+        }
+        if (empty($events)) {
+            echoData(array("error" => "no events specified"), 400);
+            return;
+        }
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            echoData(array("error" => "malformed url"), 400);
+        }
+        foreach ($events as $event) {
+            if (!in_array($event, $webhookEvents)) {
+                echoData(array("error" => "unknown event: $event"));
+                return;
+            }
+        }
+
+        $webhooks = webhooks();
+        $check = $webhooks->find(array(
+            "url" => $url,
+            "events" => $events
+        ));
+        if ($check->count() > 0) {
+            echoData(array("error" => "duplicate webhook"), 400);
+            return;
+        }
+
+        $id = hash("sha256", ($url . "_" . json_encode($events) . "_" . $app->request()->getIp() . "_" . time()), false);
+        $secret = hash("sha512", $salt . $id . $salt . uniqid() . time() . $salt);
+        $webhooks->insert(array(
+            "id" => $id,
+            "url" => $url,
+            "events" => $events,
+            "secret" => $secret,
+            "createdAt" => time(),
+
+            // Placeholders
+            "failedConnections" => new MongoInt32(0),
+            "failStatus" => new MongoInt32(0)
+        ));
+
+        echoData(array(
+            "id" => $id,
+            "url" => $url,
+            "events" => $events,
+            "secret" => $secret));
+    })->name("/webhook/register");
+
+    $app->delete("/delete/:id/:secret", function ($id, $secret) use ($app) {
+        $webhooks = webhooks();
+
+        // Check if the ID exists first
+        $document = $webhooks->find(array("id" => $id), array("id"));
+        if ($document->count() <= 0) {
+            echoData(array("error" => "webhook not found"), 404);
+            return;
+        }
+
+        // Then check the secret
+        $document = $webhooks->find(array("id" => $id, "secret" => $secret), array("id"));
+        if ($document->count() <= 0) {
+            echoData(array("error" => "Invalid secret"), 403);
+            return;
+        }
+
+        // Finally remove if everything matches
+        $webhooks->remove(array(
+            "id" => $id,
+            "secret" => $secret
+        ));
+        echoData(array("success" => true));
+    })->name("/webhook/delete");
+
+});
 
 
 // Run!
