@@ -96,7 +96,30 @@ $app->hook("slim.before.dispatch", function () use ($app) {
 });
 
 $app->get("/status", function () use ($app) {
+    $status = array(
+        "fetch" => array(
+            "start" => getStatus("fetch.start"),
+            "end" => getStatus("fetch.end"),
+            "page" => array(
+                "amount" => getStatus("fetch.page.amount"),
+                "index" => getStatus("fetch.page.index"),
+                "item" => array(
+                    "index" => getStatus("fetch.page.item.index")
+                )
+            )
+        )
+    );
+    $status["fetch"]["active"] = $status["fetch"]["end"] === 0;
 
+    $stats = array(
+        "resources" => resources()->count(),
+        "authors" => authors()->count(),
+        "categories" => categories()->count(),
+        "resource_updates" => resource_updates()->count(),
+        "resource_versions" => resource_versions()->count()
+    );
+
+    echoData(array("status" => $status, "stats" => $stats));
 });
 
 $app->group("/resources", function () use ($app) {
