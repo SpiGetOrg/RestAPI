@@ -428,6 +428,24 @@ $app->group("/webhook", function () use ($app) {
             "secret" => $secret));
     })->name("/webhook/register");
 
+    $app->get("/status/:id", function ($id) use ($app) {
+        $webhooks = webhooks();
+
+        $document = $webhooks->find(array("_id" => $id), array("_id", "failStatus", "failedConnections"));
+        if ($document->count() <= 0) {
+            echoData(array("error" => "webhook not found"), 404);
+            return;
+        }
+        $webhook = dbToJson($document);
+
+        echoData(array(
+            "id" => $id,
+            "status" => $webhook["failStatus"],
+            "failedConnections" => $webhook["failedConnections"]
+        ));
+    });
+
+
     $app->delete("/delete/:id/:secret", function ($id, $secret) use ($app) {
         $webhooks = webhooks();
 
