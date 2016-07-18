@@ -1,6 +1,6 @@
 <?php
 function db() {
-    $json = json_decode(file_get_contents("../../internal/mongo.json"));
+    $json = json_decode(file_get_contents("../../internal/mongo-v2.json"));
     $host = $json->host;
     $port = $json->port;
     $database = $json->database;
