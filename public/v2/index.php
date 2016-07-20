@@ -602,7 +602,7 @@ function paginate($app, $cursor) {
 
     $response->headers->set("X-Page-Size", "$size");
     $response->headers->set("X-Page-Index", "$page");
-    $count = $cursor->count() / $size;
+    $count = ceil($cursor->count() / $size);
     $response->headers->set("X-Page-Count", "$count");
 
     return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort));
