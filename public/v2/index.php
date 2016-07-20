@@ -251,6 +251,23 @@ $app->group("/resources", function () use ($app) {
         echoData($updates, true);
     })->name("/resources/x/updates");
 
+    $app->get("/:resource/reviews", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "reviews"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "reviews"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+        $reviews = isset($resource["reviews"]) ? $resource["reviews"] : array();
+
+        echoData($reviews);
+    });
+
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
