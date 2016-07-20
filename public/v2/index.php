@@ -266,7 +266,7 @@ $app->group("/resources", function () use ($app) {
         $reviews = isset($resource["reviews"]) ? $resource["reviews"] : array();
 
         echoData($reviews);
-    });
+    })->name("/resources/x/reviews");
 
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
