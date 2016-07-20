@@ -472,6 +472,76 @@ $app->group("/webhook", function () use ($app) {
     })->name("/webhook/delete");
 
 });
+$app->group("/metrics", function () use ($app) {
+
+    $app->get("/requests/:days", function ($days) use ($app) {
+        $minTime = strtotime("00:00:00 GMT" . $days . " days ago");
+        if ($minTime === false) {
+            echoData(array("error" => "invalid time frame"), 400);
+            exit ();
+        }
+
+        $cursor = requests()->find(array("day" => array('$gt' => $minTime)));
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "invalid time frame"), 400);
+            return;
+        }
+
+        $hourly = !is_null($app->request()->params("hourly"));
+        $fullVersions = !is_null($app->request()->params("fullVersions"));
+
+
+        $versionRegex = array(
+            "/^(.*)(\\/)([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer with slash
+            "/^(.*)([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer without slash
+            "/(.*)\\/([0-9]+)\\.([0-9]+)\\.([0-9]+)_([0-9]+)/"// Java
+        );
+
+        $json = array();
+        foreach ($cursor as $item) {
+            $day = $item["day"];
+            $ua = $item["ua"];
+            $path = $item["path"];
+            $count = $item["count"];
+
+            if ($hourly) {
+                $day = $day + (3600 * $item["hour"]);
+            }
+
+            if (!$fullVersions) {
+                foreach ($versionRegex as $regex) {
+                    if (preg_match($regex, $ua, $matches)) {
+                        $ua = trim($matches[1]);
+                    }
+                }
+            }
+
+            if (!isset($json["$day"])) {
+                $json["$day"] = array(
+                    "total" => 0,
+                    "user_agents" => array(),
+                    "methods" => array()
+                );
+            }
+            if (!isset($json["$day"]["user_agents"]["$ua"])) {
+                $json["$day"]["user_agents"]["$ua"] = $count;
+            } else {
+                $json["$day"]["user_agents"]["$ua"] += $count;
+            }
+            if (!isset($json["$day"]["methods"]["$path"])) {
+                $json["$day"]["methods"]["$path"] = $count;
+            } else {
+                $json["$day"]["methods"]["$path"] += $count;
+            }
+
+            $json["$day"]["total"] += $count;
+        }
+
+        ksort($json);
+        echoData($json);
+    });
+
+});
 
 
 // Run!
