@@ -188,9 +188,9 @@ $app->group("/resources", function () use ($app) {
 
     $app->get("/:resource/author", function ($resource) use ($app) {
         if (is_numeric($resource)) {
-            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", 'author.$id'));
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", 'author.id'));
         } else {
-            $cursor = resources()->find(array("name" => $resource), array("_id", 'author.$id'));
+            $cursor = resources()->find(array("name" => $resource), array("_id", 'author.id'));
         }
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
@@ -199,7 +199,7 @@ $app->group("/resources", function () use ($app) {
         }
         $resource = dbToJson($cursor);
 
-        $cursor = authors()->find(array("_id" => $resource['author']['$id']));
+        $cursor = authors()->find(array("_id" => $resource['author']['id']));
         $author = dbToJson($cursor);
 
         echoData($author);
@@ -220,7 +220,7 @@ $app->group("/resources", function () use ($app) {
 
         $versionIds = array();
         foreach ($resource["versions"] as $ver) {
-            $versionIds[] = $ver['$id'];
+            $versionIds[] = $ver['id'];
         }
         $cursor = paginate($app, resource_versions()->find(array('_id' => array('$in' => $versionIds))));
         $versions = dbToJson($cursor, true);
@@ -243,7 +243,7 @@ $app->group("/resources", function () use ($app) {
 
         $updateIds = array();
         foreach ($resource["updates"] as $up) {
-            $updateIds[] = $up['$id'];
+            $updateIds[] = $up['id'];
         }
         $cursor = paginate($app, resource_updates()->find(array('_id' => array('$in' => $updateIds))));
         $updates = dbToJson($cursor, true);
@@ -329,7 +329,7 @@ $app->group("/authors", function () use ($app) {
         }
         $author = dbToJson($cursor);
 
-        $cursor = paginate($app, resources()->find(array('author.$id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array('author.id' => $author["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
@@ -390,7 +390,7 @@ $app->group("/categories", function () use ($app) {
         }
         $category = dbToJson($cursor);
 
-        $cursor = paginate($app, resources()->find(array('category.$id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $cursor = paginate($app, resources()->find(array('category.id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
 
         echoData($resources);
