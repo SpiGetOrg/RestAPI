@@ -360,7 +360,8 @@ $app->group("/categories", function () use ($app) {
 });
 $app->group("/search", function () use ($app) {
 
-    $app->get("/resources/:resource(/:field)", function ($resource, $field = "name") use ($app) {
+    $app->get("/resources/:resource", function ($resource) use ($app) {
+        $field = $app->request()->params("field", "name");
         $searchFields = array(
             "name",
             "tag"
@@ -381,7 +382,8 @@ $app->group("/search", function () use ($app) {
         echoData($resources);
     });
 
-    $app->get("/authors/:author(/:field)", function ($author, $field = "name") use ($app) {
+    $app->get("/authors/:author", function ($author) use ($app) {
+        $field = $app->request()->params("field", "name");
         $searchFields = array(
             "name"
         );
