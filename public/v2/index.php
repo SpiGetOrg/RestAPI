@@ -186,6 +186,24 @@ $app->group("/resources", function () use ($app) {
         fclose($fp);
     })->name("/resources/x/download");
 
+    $app->get("/:resources/icon", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "icon"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "icon"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        header("Content-Type: image/jpeg");
+        echo base64_decode($resource["icon"]["data"]);
+        exit();
+    });
+
     $app->get("/:resource/author", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", 'author.id'));
@@ -334,6 +352,24 @@ $app->group("/authors", function () use ($app) {
 
         echoData($resources);
     })->name("/authors/x/resources");
+
+    $app->get("/:author/avatar", function ($author) use ($app) {
+        if (is_numeric($author)) {
+            $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+        } else {
+            $cursor = authors()->find(array("name" => $author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "author not found"), 404);
+            return;
+        }
+        $author = dbToJson($cursor);
+
+        header("Content-Type: image/jpeg");
+        echo base64_decode($author["icon"]["data"]);
+        exit();
+    });
 
     $app->get("/:author/go", function ($author) use ($app) {
         if (is_numeric($author)) {
