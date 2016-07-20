@@ -268,6 +268,22 @@ $app->group("/resources", function () use ($app) {
         echoData($reviews);
     })->name("/resources/x/reviews");
 
+    $app->get("/:resource/go", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        header("Location: https://spigotmc.org/resources/" . $resource["id"] . "?ref=spiget");
+    })->name("/resources/x/go");
+
     $app->get("/:resource", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), selectFields($GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"], $app->request()));
@@ -313,6 +329,22 @@ $app->group("/authors", function () use ($app) {
         echoData($resources);
     })->name("/authors/x/resources");
 
+    $app->get("/:author/go", function ($author) use ($app) {
+        if (is_numeric($author)) {
+            $cursor = authors()->find(array("_id" => (int)$author), array("_id"));
+        } else {
+            $cursor = authors()->find(array("name" => $author), array("_id"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "author not found"), 404);
+            return;
+        }
+        $author = dbToJson($cursor);
+
+        header("Location: https://spigotmc.org/members/" . $author["id"] . "?ref=spiget");
+    })->name("/authors/x/go");
+
     $app->get("/:author", function ($author) use ($app) {
         if (is_numeric($author)) {
             $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
@@ -357,6 +389,22 @@ $app->group("/categories", function () use ($app) {
 
         echoData($resources);
     })->name("/categories/x/resources");
+
+    $app->get("/:category/go", function ($category) use ($app) {
+        if (is_numeric($category)) {
+            $cursor = categories()->find(array("_id" => (int)$category), array("_id"));
+        } else {
+            $cursor = categories()->find(array("name" => $category), array("_id"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "category not found"), 404);
+            return;
+        }
+        $category = dbToJson($cursor);
+
+        header("Location: https://spigotmc.org/categories/" . $category["id"] . "?ref=spiget");
+    })->name("/authors/x/go");
 
     $app->get("/:category", function ($category) use ($app) {
         if (is_numeric($category)) {
