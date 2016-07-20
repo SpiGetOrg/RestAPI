@@ -397,7 +397,7 @@ $app->group("/search", function () use ($app) {
         $resources = dbToJson($cursor);
 
         echoData($resources);
-    });
+    })->name("/search/resources");
 
     $app->get("/authors/:query", function ($query) use ($app) {
         $field = $app->request()->params("field", "name");
@@ -418,7 +418,7 @@ $app->group("/search", function () use ($app) {
         $authors = dbToJson($cursor);
 
         echoData($authors);
-    });
+    })->name("/search/authors");
 
 });
 $app->group("/webhook", function () use ($app) {
@@ -602,7 +602,7 @@ $app->group("/metrics", function () use ($app) {
 
         ksort($json);
         echoData($json);
-    });
+    })->name("/metrics/requests");
 
 });
 
