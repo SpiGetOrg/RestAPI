@@ -360,7 +360,7 @@ $app->group("/categories", function () use ($app) {
 });
 $app->group("/search", function () use ($app) {
 
-    $app->get("/resources/:resource", function ($resource) use ($app) {
+    $app->get("/resources/:query", function ($query) use ($app) {
         $field = $app->request()->params("field", "name");
         $searchFields = array(
             "name",
@@ -371,7 +371,7 @@ $app->group("/search", function () use ($app) {
             return;
         }
 
-        $cursor = resources()->find(array($field => array('$regex' => new MongoRegex("/$resource/i"))), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request(), array("_id", "name", "tag")));
+        $cursor = resources()->find(array($field => array('$regex' => new MongoRegex("/$query/i"))), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request(), array("_id", "name", "tag")));
         if ($cursor->count() <= 0) {
             echoData(array("error" => "resource not found"), 404);
             return;
@@ -382,7 +382,7 @@ $app->group("/search", function () use ($app) {
         echoData($resources);
     });
 
-    $app->get("/authors/:author", function ($author) use ($app) {
+    $app->get("/authors/:query", function ($query) use ($app) {
         $field = $app->request()->params("field", "name");
         $searchFields = array(
             "name"
@@ -392,7 +392,7 @@ $app->group("/search", function () use ($app) {
             return;
         }
 
-        $cursor = authors()->find(array($field => array('$regex' => new MongoRegex("/$author/i"))), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request()));
+        $cursor = authors()->find(array($field => array('$regex' => new MongoRegex("/$query/i"))), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request()));
         if ($cursor->count() <= 0) {
             echoData(array("error" => "author not found"), 404);
             return;
