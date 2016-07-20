@@ -263,7 +263,7 @@ $app->group("/resources", function () use ($app) {
             return;
         }
         $resource = dbToJson($cursor);
-        $reviews = isset($resource["reviews"]) ? $resource["reviews"] : array();
+        $reviews = isset($resource["reviews"]) ? $resource["reviews"] : array();//TODO: paginate
 
         echoData($reviews);
     })->name("/resources/x/reviews");
@@ -657,6 +657,11 @@ function dbToJson($cursor, $forceArray = false) {
     $isArray = $cursor->count() > 1;
     $json = array();
     foreach ($cursor as $k => $row) {
+        if (isset($row["hidden"]) && $row["hidden"] === true) {
+            // Satisfy the one person who feels like they need to hide their resources.
+            continue;
+        }
+
         // Replace ID
         if (isset($row["_id"])) {
             $row["id"] = $row["_id"];
