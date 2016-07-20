@@ -404,7 +404,7 @@ $app->group("/categories", function () use ($app) {
         $category = dbToJson($cursor);
 
         header("Location: https://spigotmc.org/categories/" . $category["id"] . "?ref=spiget");
-    })->name("/authors/x/go");
+    })->name("/category/x/go");
 
     $app->get("/:category", function ($category) use ($app) {
         if (is_numeric($category)) {
