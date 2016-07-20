@@ -223,9 +223,9 @@ $app->group("/resources", function () use ($app) {
             $versionIds[] = $ver['$id'];
         }
         $cursor = paginate($app, resource_versions()->find(array('_id' => array('$in' => $versionIds))));
-        $versions = dbToJson($cursor);
+        $versions = dbToJson($cursor, true);
 
-        echoData($versions, true);
+        echoData($versions);
     })->name("/resources/x/versions");
 
     $app->get("/:resource/updates", function ($resource) use ($app) {
@@ -246,9 +246,9 @@ $app->group("/resources", function () use ($app) {
             $updateIds[] = $up['$id'];
         }
         $cursor = paginate($app, resource_updates()->find(array('_id' => array('$in' => $updateIds))));
-        $updates = dbToJson($cursor);
+        $updates = dbToJson($cursor, true);
 
-        echoData($updates, true);
+        echoData($updates);
     })->name("/resources/x/updates");
 
     $app->get("/:resource/reviews", function ($resource) use ($app) {
