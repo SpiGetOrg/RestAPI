@@ -358,6 +358,50 @@ $app->group("/categories", function () use ($app) {
     })->name("/categories/x");
 
 });
+$app->group("/search", function () use ($app) {
+
+    $app->get("/resources/:resource(/:field)", function ($resource, $field = "name") use ($app) {
+        $searchFields = array(
+            "name",
+            "tag"
+        );
+        if (!in_array($field, $searchFields)) {
+            echoData(array("error" => "invalid field"), 400);
+            return;
+        }
+
+        $cursor = resources()->find(array($field => array('$regex' => new MongoRegex("/$resource/i"))), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request(), array("_id", "name", "tag")));
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $cursor = paginate($app, $cursor);
+        $resources = dbToJson($cursor);
+
+        echoData($resources);
+    });
+
+    $app->get("/authors/:author(/:field)", function ($author, $field = "name") use ($app) {
+        $searchFields = array(
+            "name"
+        );
+        if (!in_array($field, $searchFields)) {
+            echoData(array("error" => "invalid field"), 400);
+            return;
+        }
+
+        $cursor = authors()->find(array($field => array('$regex' => new MongoRegex("/$author/i"))), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request()));
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "author not found"), 404);
+            return;
+        }
+        $cursor = paginate($app, $cursor);
+        $authors = dbToJson($cursor);
+
+        echoData($authors);
+    });
+
+});
 $app->group("/webhook", function () use ($app) {
 
     $app->get("/events", function () use ($app) {
