@@ -263,7 +263,13 @@ $app->group("/resources", function () use ($app) {
             return;
         }
         $resource = dbToJson($cursor);
-        $reviews = isset($resource["reviews"]) ? $resource["reviews"] : array();//TODO: paginate
+
+        $reviewIds = array();
+        foreach ($resource["reviews"] as $up) {
+            $reviewIds[] = $up['id'];
+        }
+        $cursor = paginate($app, resource_reviews()->find(array('_id' => array('$in' => $reviewIds))));
+        $reviews = dbToJson($cursor, true);
 
         echoData($reviews);
     })->name("/resources/x/reviews");
@@ -805,6 +811,11 @@ function resource_versions() {
 function resource_updates() {
     $db = db();
     return $db->resource_updates;
+}
+
+function resource_reviews() {
+    $db = db();
+    return $db->resource_reviews;
 }
 
 function authors() {
