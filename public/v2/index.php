@@ -709,13 +709,21 @@ function paginate($app, $cursor) {
     $page = max((int)$request->params("page", 1), 1);
     $sort = $request->params("sort", "id");
     if ($sort == "id") $sort = "_id";
+    $sortMode = 1;
+    if (strpos($sort, "-") === 0) {
+        $sortMode = -1;
+        $sort = substr($sort, 1);
+    } else if (strpos($sort, "+") === 0) {
+        $sortMode = 1;
+        $sort = substr($sort, 1);
+    }
 
     $response->headers->set("X-Page-Size", "$size");
     $response->headers->set("X-Page-Index", "$page");
     $count = ceil($cursor->count() / $size);
     $response->headers->set("X-Page-Count", "$count");
 
-    return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort));
+    return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort => $sortMode));
 }
 
 function selectFields($allowed, $request, $default = null) {
