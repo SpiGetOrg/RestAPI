@@ -104,7 +104,8 @@ $app->get("/status", function () use ($app) {
                 "amount" => getStatus("fetch.page.amount"),
                 "index" => getStatus("fetch.page.index"),
                 "item" => array(
-                    "index" => getStatus("fetch.page.item.index")
+                    "index" => getStatus("fetch.page.item.index"),
+                    "state" => getStatus("fetch.page.item.state")
                 )
             )
         )
