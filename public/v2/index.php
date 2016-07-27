@@ -17,7 +17,9 @@ $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"] = array(
     "rating",
     "releaseDate",
     "updateDate",
-    "downloads");
+    "downloads",
+
+    "hidden");
 $GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = array(
     "_id",
     "name",
@@ -39,7 +41,9 @@ $GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = array(
     "updateDate",
     "downloads",
     "icon",
-    "reviews"
+    "reviews",
+
+    "hidden"
 );
 $GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"] = array(
     "_id",
