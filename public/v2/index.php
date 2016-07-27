@@ -713,7 +713,6 @@ function paginate($app, $cursor) {
     $size = max((int)$request->params("size", 10), 1);
     $page = max((int)$request->params("page", 1), 1);
     $sort = $request->params("sort", "id");
-    if ($sort == "id") $sort = "_id";
     $sortMode = 1;
     if (strpos($sort, "-") === 0) {
         $sortMode = -1;
@@ -722,6 +721,10 @@ function paginate($app, $cursor) {
         $sortMode = 1;
         $sort = substr($sort, 1);
     }
+    $sort = trim($sort);
+    $response->headers->set("X-Page-Sort", $sort);
+    $response->headers->set("X-Page-Order", $sortMode);
+    if ($sort == "id") $sort = "_id";
 
     $response->headers->set("X-Page-Size", "$size");
     $response->headers->set("X-Page-Index", "$page");
