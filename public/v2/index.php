@@ -363,6 +363,25 @@ $app->group("/authors", function () use ($app) {
         echoData($resources);
     })->name("/authors/x/resources");
 
+    $app->get("/:author/reviews", function ($author) use ($app) {
+        if (is_numeric($author)) {
+            $cursor = authors()->find(array("_id" => (int)$author), array("_id"));
+        } else {
+            $cursor = authors()->find(array("name" => $author), array("_id"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "author not found"), 404);
+            return;
+        }
+        $author = dbToJson($cursor);
+
+        $cursor = paginate($app, resource_reviews()->find(array('author.id' => $author["id"])));
+        $reviews = dbToJson($cursor, true);
+
+        echoData($reviews);
+    })->name("/authors/x/reviews");
+
     $app->get("/:author/avatar", function ($author) use ($app) {
         if (is_numeric($author)) {
             $cursor = authors()->find(array("_id" => (int)$author), array("_id", "icon"));
