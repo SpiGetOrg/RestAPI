@@ -61,37 +61,42 @@ $app->hook("slim.before", function () use ($app) {
     $app->response()->header("X-API-Time", time());
 });
 $app->hook("slim.before.dispatch", function () use ($app) {
-    if ($app->response()->isSuccessful()) {
-        $ua = !empty ($_SERVER ['HTTP_USER_AGENT']) ? $_SERVER ['HTTP_USER_AGENT'] : "unknown";
+    $dontTrackMeHeader = $app->request()->headers("X-Do-Not-Track-Me", "false");
+    if ($dontTrackMeHeader === "true") {
+        $app->response()->header("X-Do-Not-Track-Me", "true");
+    } else {
+        if ($app->response()->isSuccessful()) {
+            $ua = !empty ($_SERVER ['HTTP_USER_AGENT']) ? $_SERVER ['HTTP_USER_AGENT'] : "unknown";
 
-        //StatusCake
-        if (preg_match("/\\(StatusCake\\)/", $ua)) {
-            $ua = "StatusCake";
+            //StatusCake
+            if (preg_match("/\\(StatusCake\\)/", $ua)) {
+                $ua = "StatusCake";
+            }
+            if (strpos($ua, "Mozilla") !== false || strpos($ua, "Internet Explorer") !== false || strpos($ua, "AppleWebKit") !== false || strpos($ua, "Opera") !== false) {
+                $ua = "default";
+            }
+            if (isset($_REQUEST["spiget__ua"])) {
+                $ua = $_REQUEST["spiget__ua"];
+            }
+
+            $today = strtotime("today");
+            $hour = intval(date("H"));
+
+            $method = $app->request()->getMethod();
+            $path = "/v2" . $app->router()->getCurrentRoute()->getName();
+            $ip = $app->request()->getIp();
+
+            requests()->update(array(
+                "day" => $today,
+                "hour" => $hour,
+                "ua" => $ua,
+                "path" => $path,
+                "ip" => $ip
+            ), array('$inc' => array("count" => 1)), array(
+                "upsert" => true,
+                "writeConcern" => 0
+            ));
         }
-        if (strpos($ua, "Mozilla") !== false || strpos($ua, "Internet Explorer") !== false || strpos($ua, "AppleWebKit") !== false || strpos($ua, "Opera") !== false) {
-            $ua = "default";
-        }
-        if (isset($_REQUEST["spiget__ua"])) {
-            $ua = $_REQUEST["spiget__ua"];
-        }
-
-        $today = strtotime("today");
-        $hour = intval(date("H"));
-
-        $method = $app->request()->getMethod();
-        $path = "/v2" . $app->router()->getCurrentRoute()->getName();
-        $ip = $app->request()->getIp();
-
-        requests()->update(array(
-            "day" => $today,
-            "hour" => $hour,
-            "ua" => $ua,
-            "path" => $path,
-            "ip" => $ip
-        ), array('$inc' => array("count" => 1)), array(
-            "upsert" => true,
-            "writeConcern" => 0
-        ));
     }
 });
 
