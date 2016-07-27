@@ -346,9 +346,9 @@ $app->group("/authors", function () use ($app) {
 
     $app->get("/:author/resources", function ($author) use ($app) {
         if (is_numeric($author)) {
-            $cursor = authors()->find(array("_id" => (int)$author), array("_id", "author.id"));
+            $cursor = authors()->find(array("_id" => (int)$author), array("_id"));
         } else {
-            $cursor = authors()->find(array("name" => $author), array("_id", "author.id"));
+            $cursor = authors()->find(array("name" => $author), array("_id"));
         }
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
