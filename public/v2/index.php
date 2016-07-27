@@ -346,9 +346,9 @@ $app->group("/authors", function () use ($app) {
 
     $app->get("/:author/resources", function ($author) use ($app) {
         if (is_numeric($author)) {
-            $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+            $cursor = authors()->find(array("_id" => (int)$author), array("_id", "author.id"));
         } else {
-            $cursor = authors()->find(array("name" => $author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+            $cursor = authors()->find(array("name" => $author), array("_id", "author.id"));
         }
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
@@ -365,9 +365,9 @@ $app->group("/authors", function () use ($app) {
 
     $app->get("/:author/avatar", function ($author) use ($app) {
         if (is_numeric($author)) {
-            $cursor = authors()->find(array("_id" => (int)$author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+            $cursor = authors()->find(array("_id" => (int)$author), array("_id", "icon"));
         } else {
-            $cursor = authors()->find(array("name" => $author), selectFields($GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"], $app->request()));
+            $cursor = authors()->find(array("name" => $author), array("_id", "icon"));
         }
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
