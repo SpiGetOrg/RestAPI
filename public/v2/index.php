@@ -254,7 +254,7 @@ $app->group("/resources", function () use ($app) {
             }
         }
         $cursor = resource_versions()->find(array('_id' => $highest));
-        $version = dbToJson($cursor, true);
+        $version = dbToJson($cursor);
 
         echoData($version);
     })->name("/resources/x/versions/latest");
@@ -303,7 +303,7 @@ $app->group("/resources", function () use ($app) {
             }
         }
         $cursor = resource_updates()->find(array('_id' => $highest));
-        $update = dbToJson($cursor, true);
+        $update = dbToJson($cursor);
 
         echoData($update);
     })->name("/resources/x/updates/latest");
