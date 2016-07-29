@@ -282,6 +282,32 @@ $app->group("/resources", function () use ($app) {
         echoData($versions);
     })->name("/resources/x/versions");
 
+    $app->get("/:resource/updates/latest", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "updates"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "updates"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $highest = 0;
+        foreach ($resource["updates"] as $up) {
+            $id = $up["id"];
+            if ($id > $highest) {
+                $highest = $id;
+            }
+        }
+        $cursor = resource_updates()->find(array('_id' => $highest));
+        $update = dbToJson($cursor, true);
+
+        echoData($update);
+    })->name("/resources/x/updates/latest");
+
     $app->get("/:resource/updates", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "updates"));
