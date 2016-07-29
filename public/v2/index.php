@@ -233,6 +233,32 @@ $app->group("/resources", function () use ($app) {
         echoData($author);
     })->name("/resources/x/author");
 
+    $app->get("/:resource/versions/latest", function ($resource) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "versions"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        $highest = 0;
+        foreach ($resource["versions"] as $ver) {
+            $id = $ver["id"];
+            if ($id > $highest) {
+                $highest = $id;
+            }
+        }
+        $cursor = resource_versions()->find(array('_id' => $highest));
+        $version = dbToJson($cursor, true);
+
+        echoData($version);
+    })->name("/resources/x/versions/latest");
+
     $app->get("/:resource/versions", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
