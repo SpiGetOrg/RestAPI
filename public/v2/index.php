@@ -408,9 +408,9 @@ $app->group("/authors", function () use ($app) {
         $lastTime = time() - 7200;
         // We don't really have an 'update time' field, so just guess by the fetch time
         $cursor = paginate($app, authors()->find(array('$where' => "this.fetch.latest > $lastTime"), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
-        $resources = dbToJson($cursor, true);
+        $authors = dbToJson($cursor, true);
 
-        echoData($resources);
+        echoData($authors);
     })->name("/authors/recentUpdates");
 
     $app->get("/:author/resources", function ($author) use ($app) {
