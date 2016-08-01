@@ -148,6 +148,14 @@ $app->group("/resources", function () use ($app) {
         echoData($resources);
     })->name("/resources/new");
 
+    $app->get("/recentUpdates", function () use ($app) {
+        $lastTime = time() - 7200;
+        $cursor = paginate($app, resources()->find(array('$where' => "this.updateDate > $lastTime"), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor, true);
+
+        echoData($resources);
+    })->name("/resources/recentUpdates");
+
     $app->get("/for/:versions", function ($versions = "") use ($app) {
         $method = $app->request()->params("method", "any");
         $versionArray = preg_split("/\\,/i", $versions);
@@ -395,6 +403,15 @@ $app->group("/authors", function () use ($app) {
 
         echoData($authors);
     })->name("/authors");
+
+    $app->get("/recentUpdates", function () use ($app) {
+        $lastTime = time() - 7200;
+        // We don't really have an 'update time' field, so just guess by the fetch time
+        $cursor = paginate($app, authors()->find(array('$where' => "this.fetch.latest > $lastTime"), selectFields($GLOBALS["SPIGET_AUTHOR_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor, true);
+
+        echoData($resources);
+    })->name("/authors/recentUpdates");
 
     $app->get("/:author/resources", function ($author) use ($app) {
         if (is_numeric($author)) {
