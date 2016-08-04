@@ -60,10 +60,6 @@ $app = new Slim\Slim();
 $app->notFound(function () use ($app) {
     echoData(array("error" => "invalid route"));
 });
-$app->hook("slim.before", function () use ($app) {
-    $app->response()->header("Access-Control-Allow-Origin", "*");
-    $app->response()->header("X-API-Time", time());
-});
 $app->hook("slim.before.dispatch", function () use ($app) {
     $dontTrackMeHeader = $app->request()->headers("X-Do-Not-Track-Me", "false");
     if ($dontTrackMeHeader === "true") {
@@ -899,6 +895,7 @@ function echoData($json, $status = 0) {
     $app->response()->header("Expires", gmdate('D, d M Y H:i:s', strtotime('+1 hour')) . " GMT");
     $app->response()->header("Last-Modified", gmdate("D, d M Y H:i:s", (getStatus("fetch.start") / 1000)));
     $app->response()->header("Connection: close");
+    $app->response()->header("Access-Control-Allow-Origin", "*");
 
     $paramPretty = $app->request()->params("pretty");
     $pretty = true;
