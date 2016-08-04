@@ -60,6 +60,14 @@ $app = new Slim\Slim();
 $app->notFound(function () use ($app) {
     echoData(array("error" => "invalid route"));
 });
+$app->hook("slim.before", function () use ($app) {
+    header("Access-Control-Allow-Origin: *");
+    if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+        header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
+        header("Access-Control-Request-Headers: X-Requested-With, Accept, Content-Type, Origin");
+        exit;
+    }
+});
 $app->hook("slim.before.dispatch", function () use ($app) {
     $dontTrackMeHeader = $app->request()->headers("X-Do-Not-Track-Me", "false");
     if ($dontTrackMeHeader === "true") {
@@ -794,7 +802,8 @@ $app->group("/metrics", function () use ($app) {
 // Run!
 $app->run();
 
-function paginate($app, $cursor) {
+function paginate($app, $cursor)
+{
     $request = $app->request();
     $response = $app->response();
 
@@ -822,7 +831,8 @@ function paginate($app, $cursor) {
     return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort => $sortMode));
 }
 
-function selectFields($allowed, $request, $default = null) {
+function selectFields($allowed, $request, $default = null)
+{
     $paramFields = $request->params("fields");
     if (!isset($paramFields)) {
         if (!is_null($default)) {
@@ -848,7 +858,8 @@ function selectFields($allowed, $request, $default = null) {
     return $fields;
 }
 
-function dbToJson($cursor, $forceArray = false) {
+function dbToJson($cursor, $forceArray = false)
+{
     $isArray = $cursor->count() > 1;
     $json = array();
     foreach ($cursor as $k => $row) {
@@ -873,7 +884,8 @@ function dbToJson($cursor, $forceArray = false) {
     return $json;
 }
 
-function makeDownloadFile($resource, $type = ".jar") {
+function makeDownloadFile($resource, $type = ".jar")
+{
     $resource = (string)$resource;
     $split = str_split($resource);
 
@@ -887,7 +899,8 @@ function makeDownloadFile($resource, $type = ".jar") {
 }
 
 
-function echoData($json, $status = 0) {
+function echoData($json, $status = 0)
+{
     $app = \Slim\Slim::getInstance();
 
     $app->response()->header("X-Api-Time", time());
@@ -895,7 +908,6 @@ function echoData($json, $status = 0) {
     $app->response()->header("Expires", gmdate('D, d M Y H:i:s', strtotime('+1 hour')) . " GMT");
     $app->response()->header("Last-Modified", gmdate("D, d M Y H:i:s", (getStatus("fetch.start") / 1000)));
     $app->response()->header("Connection: close");
-    $app->response()->header("Access-Control-Allow-Origin", "*");
 
     $paramPretty = $app->request()->params("pretty");
     $pretty = true;
@@ -926,7 +938,8 @@ function echoData($json, $status = 0) {
     }
 }
 
-function getStatus($key) {
+function getStatus($key)
+{
     $cursor = status()->find(array("key" => $key), array("value"))->limit(1);
     if ($cursor->count() <= 0) {
         return null;
@@ -940,57 +953,68 @@ function getStatus($key) {
 
 //** Database **//
 
-function resources() {
+function resources()
+{
     $db = db();
     return $db->resources;
 }
 
-function resource_versions() {
+function resource_versions()
+{
     $db = db();
     return $db->resource_versions;
 }
 
-function resource_updates() {
+function resource_updates()
+{
     $db = db();
     return $db->resource_updates;
 }
 
-function resource_reviews() {
+function resource_reviews()
+{
     $db = db();
     return $db->resource_reviews;
 }
 
-function authors() {
+function authors()
+{
     $db = db();
     return $db->authors;
 }
 
-function status() {
+function status()
+{
     $db = db();
     return $db->status;
 }
 
-function categories() {
+function categories()
+{
     $db = db();
     return $db->categories;
 }
 
-function requests() {
+function requests()
+{
     $db = db();
     return $db->requests;
 }
 
-function requestsPrecise() {
+function requestsPrecise()
+{
     $db = db();
     return $db->requests_precise;
 }
 
-function methods() {
+function methods()
+{
     $db = db();
     return $db->methods;
 }
 
-function webhooks() {
+function webhooks()
+{
     $db = db();
     return $db->webhooks;
 }
