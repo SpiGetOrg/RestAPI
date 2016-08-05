@@ -108,6 +108,10 @@ $app->hook("slim.before.dispatch", function () use ($app) {
     }
 });
 
+$app->get("/", function () use ($app) {
+    $app->redirect("/v2/status");
+});
+
 $app->get("/status", function () use ($app) {
     $status = array(
         "fetch" => array(
