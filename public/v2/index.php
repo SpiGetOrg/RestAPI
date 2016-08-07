@@ -590,7 +590,7 @@ $app->group("/search", function () use ($app) {
             return;
         }
         $cursor = paginate($app, $cursor);
-        $resources = dbToJson($cursor);
+        $resources = dbToJson($cursor, true);
 
         echoData($resources);
     })->name("/search/resources");
@@ -611,7 +611,7 @@ $app->group("/search", function () use ($app) {
             return;
         }
         $cursor = paginate($app, $cursor);
-        $authors = dbToJson($cursor);
+        $authors = dbToJson($cursor, true);
 
         echoData($authors);
     })->name("/search/authors");
