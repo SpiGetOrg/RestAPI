@@ -341,7 +341,7 @@ $app->group("/resources", function () use ($app) {
         $update = dbToJson($cursor);
 
         echoData($update);
-    })->name("/resources/x/updates/latest");
+    })->name("/resources/x/updates/x");
 
     $app->get("/:resource/updates", function ($resource) use ($app) {
         if (is_numeric($resource)) {
