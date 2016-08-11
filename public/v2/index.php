@@ -278,6 +278,28 @@ $app->group("/resources", function () use ($app) {
         echoData($version);
     })->name("/resources/x/versions/latest");
 
+    $app->get("/:resource/versions/:version", function ($resource, $version) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "versions"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+
+        $cursor = resource_versions()->find(array("_id" => (int)$version));
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource version not found"), 404);
+            return;
+        }
+        $version = dbToJson($cursor);
+
+        echoData($version);
+    })->name("/resources/x/versions/x");
+
     $app->get("/:resource/versions", function ($resource) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
