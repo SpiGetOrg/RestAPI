@@ -252,6 +252,40 @@ $app->group("/resources", function () use ($app) {
         echoData($author);
     })->name("/resources/x/author");
 
+    $app->get("/:resource/versions/:version/download", function ($resource, $version) use ($app) {
+        if (is_numeric($resource)) {
+            $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
+        } else {
+            $cursor = resources()->find(array("name" => $resource), array("_id", "versions"));
+        }
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "resource not found"), 404);
+            return;
+        }
+        $resource = dbToJson($cursor);
+
+        if ("latest" === $version) {
+            $highest = 0;
+            foreach ($resource["versions"] as $ver) {
+                $id = $ver["id"];
+                if ($id > $highest) {
+                    $highest = $id;
+                }
+            }
+            $cursor = resource_versions()->find(array('_id' => $highest));
+        } else {
+            $cursor = resource_versions()->find(array("_id" => (int)$version));
+            if ($cursor->count() <= 0) {
+                echoData(array("error" => "resource version not found"), 404);
+                return;
+            }
+        }
+        $version = dbToJson($cursor);
+
+        header("Location: https://spigotmc.org/resources/" . $resource["id"] . "/download?version=" . $version["id"]);
+    })->name("/resources/x/versions/x/download");
+
     $app->get("/:resource/versions/:version", function ($resource, $version) use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "versions"));
