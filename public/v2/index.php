@@ -216,7 +216,7 @@ $app->group("/resources", function () use ($app) {
         fclose($fp);
     })->name("/resources/x/download");
 
-    $app->get("/:resources/icon(/:type)", function ($resource, $type = "image") use ($app) {
+    $app->get("/:resource/icon(/:type)", function ($resource, $type = "image") use ($app) {
         if (is_numeric($resource)) {
             $cursor = resources()->find(array("_id" => (int)$resource), array("_id", "icon"));
         } else {
@@ -231,7 +231,7 @@ $app->group("/resources", function () use ($app) {
 
         echoImage($app, $resource, $type, $GLOBALS["DEFAULT_ICON_DATA"], $GLOBALS["DEFAULT_ICON_URL"]);
         exit();
-    });
+    })->name("/resources/x/icon");
 
     $app->get("/:resource/author", function ($resource) use ($app) {
         if (is_numeric($resource)) {
