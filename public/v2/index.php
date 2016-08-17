@@ -144,6 +144,15 @@ $app->get("/status", function () use ($app) {
     $status["fetch"]["active"] = $status["fetch"]["end"] === 0;
     $status["existence"]["active"] = $status["existence"]["end"] === 0;
 
+    if ($spigotStatus = getSpigotStatus()) {
+        $status["spigotmc"] = array(
+            "status" => $spigotStatus["Status"],
+            "online" => $spigotStatus["Status"] === "Up",
+            "uptime" => $spigotStatus["Uptime"],
+            "lastCheck" => $spigotStatus["LastTested"]
+        );
+    }
+
     $stats = array(
         "resources" => resources()->count(),
         "authors" => authors()->count(),
@@ -1106,6 +1115,28 @@ function getStatus($key)
         return $value->value;
     }
     return $value;
+}
+
+function getSpigotStatus()
+{
+    try {
+        $config = json_decode(file_get_contents("../../internal/statuscake.json"), true);
+
+        $ch = curl_init("https://www.statuscake.com/API/Tests/Details/?TestID=" . $config["testId"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Spiget");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "API: " . $config["apiKey"],
+            "Username: " . $config["username"]
+        ));
+
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result, true);
+    } catch (Exception $e) {
+        return false;
+    }
 }
 
 //** Database **//
