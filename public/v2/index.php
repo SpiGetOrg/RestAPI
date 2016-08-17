@@ -129,9 +129,20 @@ $app->get("/status", function () use ($app) {
                     "state" => getStatus("fetch.page.item.state")
                 )
             )
+        ),
+        "existence" => array(
+            "start" => getStatus("existence.start"),
+            "end" => getStatus("existence.end"),
+            "document" => array(
+                "amount" => getStatus("existence.document.amount"),
+                "suspects" => getStatus("existence.document.suspects"),
+                "index" => getStatus("existence.document.index"),
+                "id" => getStatus("existence.document.id")
+            )
         )
     );
     $status["fetch"]["active"] = $status["fetch"]["end"] === 0;
+    $status["existence"]["active"] = $status["existence"]["end"] === 0;
 
     $stats = array(
         "resources" => resources()->count(),
