@@ -149,7 +149,7 @@ $app->get("/status", function () use ($app) {
             "status" => $spigotStatus["Status"],
             "online" => $spigotStatus["Status"] === "Up",
             "uptime" => $spigotStatus["Uptime"],
-            "lastCheck" => $spigotStatus["LastTested"]
+            "lastCheck" => $spigotStatus["LastTested"] . " GMT"
         );
     }
 
