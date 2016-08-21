@@ -144,7 +144,7 @@ $app->get("/status", function () use ($app) {
     $status["fetch"]["active"] = $status["fetch"]["end"] === 0;
     $status["existence"]["active"] = $status["existence"]["end"] === 0;
 
-    if ($spigotStatus = getSpigotStatus()) {
+    if (($app->request()->params("spigotStatus", "false") === "true") && ($spigotStatus = getSpigotStatus())) {
         $status["spigotmc"] = array(
             "status" => $spigotStatus["Status"],
             "online" => $spigotStatus["Status"] === "Up",
