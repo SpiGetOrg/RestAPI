@@ -643,6 +643,35 @@ $app->group("/categories", function () use ($app) {
     })->name("/categories/x");
 
 });
+
+$app->group("/reviews", function () use ($app) {
+
+    $app->get("/", function () use ($app) {
+        $cursor = paginate($app, resource_reviews()->find());
+        $reviews = dbToJson($cursor, true);
+
+        echoData($reviews);
+    })->name("/reviews");
+
+    $app->get("/trends", function () use ($app) {
+        $cursor = resource_reviews()->find();
+        $data = array(
+            "1" => 0,
+            "2" => 0,
+            "3" => 0,
+            "4" => 0,
+            "5" => 0
+        );
+        foreach ($cursor as $doc) {
+            $rating = $doc["rating"]["average"];
+            $data["$rating"]++;
+        }
+
+        echoData($data);
+    })->name("/reviews/trends");
+
+});
+
 $app->group("/search", function () use ($app) {
 
     $app->get("/resources/:query", function ($query) use ($app) {
