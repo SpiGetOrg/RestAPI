@@ -60,6 +60,8 @@ $GLOBALS["DEFAULT_ICON_URL"] = "https://static.spigotmc.org/styles/spigot/xenres
 $GLOBALS["DEFAULT_AVATAR_DATA"] = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo4QUFGMTlEMTUxRkRFMjExQTVBMTlGQUQ3OTQ4QkQxMCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowQTIyRjREMDdGMjIxMUUzQkE1NThGRDdDNTc5MkFBNiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowQTIyRjRDRjdGMjIxMUUzQkE1NThGRDdDNTc5MkFBNiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjIxMDM1QkRGODM2M0UzMTE4Qjk5QUIyRjRFRjZDNzUxIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjhBQUYxOUQxNTFGREUyMTFBNUExOUZBRDc5NDhCRDEwIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+RfxUUgAAAbNJREFUeNpi/P//P8NQBkwMQxyMemDUA6MeGPXAqAdGPTCkAQspirUNzIhRJgjEmUDsC9ICFbsKxFuAeBoQv0dWfPXCKfp5gAjgAsRLgFgcTdwCinOBOAaI9wzGJARy4G4sjkcG4lA1FoPNA6CYXEOC+rXUin1qeSAAiKVJUC8F1TNoPKBPhh6DoV6M/h9MHvhLJz008wAjnfTQtBQiFTAPJg98IEPP58Hkge1k6Nk3mDxwBVrDEgvOAPHpwVaMpgDxbyLVJg7GttAjIHYF4u9E1NpXBmt/4CC0Vl4OxJ+QxL9C2z+g2nfjgPUHiAS3gTgKytaC0jeA+N+Ad2hIADLQpHQLyhcAYk4gfjqYu5Si0Iy8E4gfAvEbaKYG4bfQPLITqkaUWpYykjI6jaVLyQrEHkAcBu1C8hNp1Ecg3gzEq4B4B7Bb+ZveHjAH4lAgDgJiRQoD8T4QrwPi1UCPnKS1B0ChXAvEpjTKO6AKrgHoka20ysTrqdUIwwFMoMUsC60yMS0dT5YdI2tgCwgqgbichjEB6qV10iwTD0YwOrg76oFRD4x6YNQDox4Y9cBAAoAAAwCVnli0jNHTPgAAAABJRU5ErkJggg==";
 $GLOBALS["DEFAULT_AVATAR_URL"] = "https://static.spigotmc.org/styles/spigot/xenforo/avatars/avatar_female_s.png";
 
+$GLOBALS["MAX_PAGE_SIZE"] = 15000;
+
 $app = new Slim\Slim();
 $app->notFound(function () use ($app) {
     echoData(array("error" => "invalid route"));
@@ -973,6 +975,8 @@ function paginate($app, $cursor)
     $response = $app->response();
 
     $size = max((int)$request->params("size", 10), 1);
+    $size = min($size, $GLOBALS["MAX_PAGE_SIZE"]);
+
     $page = max((int)$request->params("page", 1), 1);
     $sort = $request->params("sort", "id");
     $sortMode = 1;
@@ -989,6 +993,7 @@ function paginate($app, $cursor)
     if ($sort == "id") $sort = "_id";
 
     $response->headers->set("X-Page-Size", "$size");
+    $response->headers->set("X-Max-Page-Size", $GLOBALS["MAX_PAGE_SIZE"]);
     $response->headers->set("X-Page-Index", "$page");
     $count = ceil($cursor->count() / $size);
     $response->headers->set("X-Page-Count", "$count");
