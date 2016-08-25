@@ -658,6 +658,7 @@ $app->group("/reviews", function () use ($app) {
     $app->get("/trends", function () use ($app) {
         $cursor = resource_reviews()->find();
         $data = array(
+            "total" => $cursor->count(),
             "1" => 0,
             "2" => 0,
             "3" => 0,
