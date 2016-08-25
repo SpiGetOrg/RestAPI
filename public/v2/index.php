@@ -673,6 +673,26 @@ $app->group("/reviews", function () use ($app) {
         echoData($data);
     })->name("/reviews/trends");
 
+    $app->get("/:review", function ($review) use ($app) {
+        $cursor = resource_reviews()->find(array("_id" => (int)$review));
+        $cursor->limit(1);
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "review not found"));
+            return;
+        }
+        $review = dbToJson($cursor);
+
+        // Resource ID
+        $cursor = resources()->find(array("reviews" => array('$elemMatch' => array("id" => $review["id"]))));
+        if ($cursor->count() > 0) {
+            $review["resource"] = dbToJson($cursor)["id"];
+        } else {
+            $review["resource"] = -1;
+        }
+
+        echoData($review);
+    })->name("/reviews/x");
+
 });
 
 $app->group("/search", function () use ($app) {
