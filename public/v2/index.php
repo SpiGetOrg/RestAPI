@@ -234,6 +234,7 @@ $app->group("/resources", function () use ($app) {
         header("Content-Type: $file_type");
         header("Content-Disposition: attachment; filename=$file_name");
         header("Content-Length: " . filesize($file));
+        header("Connection: close");
         fpassthru($fp);
         fclose($fp);
         exit();
