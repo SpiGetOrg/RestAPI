@@ -236,6 +236,7 @@ $app->group("/resources", function () use ($app) {
         header("Content-Length: " . filesize($file));
         fpassthru($fp);
         fclose($fp);
+        exit();
     })->name("/resources/x/download");
 
     $app->get("/:resource/icon(/:type)", function ($resource, $type = "image") use ($app) {
