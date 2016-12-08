@@ -606,7 +606,7 @@ $app->group("/categories", function () use ($app) {
             echoData(array("error" => "category not found"), 404);
             return;
         }
-        $category = dbToJson($cursor);
+        $category = dbToJson($cursor, true)[0];
 
         $cursor = paginate($app, resources()->find(array('category.id' => $category["id"]), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
         $resources = dbToJson($cursor, true);
