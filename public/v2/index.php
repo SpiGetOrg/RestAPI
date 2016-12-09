@@ -89,8 +89,8 @@ $app->hook("slim.before.dispatch", function () use ($app) {
             if (strpos($ua, "Mozilla") !== false || strpos($ua, "Internet Explorer") !== false || strpos($ua, "AppleWebKit") !== false || strpos($ua, "Opera") !== false) {
                 $ua = "default";
             }
-            if (isset($_REQUEST["spiget__ua"])) {
-                $ua = $_REQUEST["spiget__ua"];
+            if (isset($_REQUEST["spiget___ua"])) {
+                $ua = $_REQUEST["spiget___ua"];
             }
 
             $today = strtotime("today");
