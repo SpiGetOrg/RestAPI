@@ -879,7 +879,8 @@ $app->group("/metrics", function () use ($app) {
         $versionRegex = array(
             "/^(.*)(\\/)([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer with slash
             "/^(.*)([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer without slash
-            "/(.*)\\/([0-9]+)\\.([0-9]+)\\.([0-9]+)_([0-9]+)/"// Java
+            "/^(Java)\\/(.*)$/",// Java
+            "/^(ViaVersion) (.*)$/"// ViaVersion
         );
 
         $json = array();
