@@ -900,6 +900,11 @@ $app->group("/metrics", function () use ($app) {
                         $ua = trim($matches[1]);
                     }
                 }
+
+                //TODO: remove this eventually (maybe)
+                if (strpos($ua, "Java") === 0) {
+                    $ua .= " #LazyDev";
+                }
             }
 
             if (!isset($json["$day"])) {
