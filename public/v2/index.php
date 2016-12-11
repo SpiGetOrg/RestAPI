@@ -68,6 +68,7 @@ $app->notFound(function () use ($app) {
 });
 $app->hook("slim.before", function () use ($app) {
     header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Expose-Headers: Content-Type, Content-Length, Location, X-Api-Time, X-Page-Sort, X-Page-Order, X-Page-Size, X-Max-Page-Size, X-Page-Index, X-Page-Count");
     if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
         header("Access-Control-Request-Headers: X-Requested-With, Accept, Content-Type, Origin");
