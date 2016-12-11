@@ -71,6 +71,7 @@ $app->hook("slim.before", function () use ($app) {
     if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
         header("Access-Control-Request-Headers: X-Requested-With, Accept, Content-Type, Origin");
+        header("Access-Control-Allow-Headers: Spiget-User-Agent");
         exit;
     }
 });
@@ -89,7 +90,9 @@ $app->hook("slim.before.dispatch", function () use ($app) {
             if (strpos($ua, "Mozilla") !== false || strpos($ua, "Internet Explorer") !== false || strpos($ua, "AppleWebKit") !== false || strpos($ua, "Opera") !== false) {
                 $ua = "default";
             }
-            if (isset($_REQUEST["spiget___ua"])) {
+            if (isset($_SERVER["HTTP_SPIGET_USER_AGENT"])) {
+                $ua = $_SERVER["HTTP_SPIGET_USER_AGENT"];
+            } else if (isset($_REQUEST["spiget___ua"])) {
                 $ua = $_REQUEST["spiget___ua"];
             }
 
