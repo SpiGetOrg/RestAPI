@@ -34,29 +34,20 @@ function paginate($app, $cursor)
 
 function selectFields($allowed, $request, $default = null)
 {
-    $paramFields = $request->params("fields");
-    if (!isset($paramFields)) {
-        if (!is_null($default)) {
-            return $default;
-        } else {
+    // enforce default or default down to allowed
+    if (is_null($request->params("fields"))) {
+        if (is_null($default)) {
             return $allowed;
         }
-    } else {
-        $paramFields = preg_split("/\\,/i", $paramFields);
+        return $default;
     }
-    $fields = $allowed;
-    foreach ($allowed as $field) {
-        if ("_id" === $field) {
-            continue;
-        } else {
-            if (!in_array($field, $paramFields)) {
-                if (($key = array_search($field, $fields)) !== false) {
-                    unset($fields[$key]);
-                }
-            }
-        }
-    }
-    return $fields;
+    // split by comma, remove all whitespace, cast to lower case
+    $fields = array_map(function($input){
+        return trim(strtolower($input));
+    }, explode(',', $request->params("fields")));
+
+    // return all keys which intersect with the allowed list
+    return array_intersect($allowed, $fields);
 }
 
 
