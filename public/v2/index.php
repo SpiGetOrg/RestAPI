@@ -1,6 +1,7 @@
 <?php
+require "../../vendor/autoload.php";
+
 include("../../internal/Config.php");
-include("../../internal/Slim.php");
 include("../../internal/Database.php");
 include("../../internal/Utils.php");
 

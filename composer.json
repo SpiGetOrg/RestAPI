@@ -1,0 +1,15 @@
+{
+  "name": "spiget/rest-api",
+  "description": "Spiget.org REST API",
+  "minimum-stability": "beta",
+  "license": "Apache License 2.0",
+  "authors": [
+    {
+      "name": "Haylee Schäfer",
+      "email": "mail@inventivetalent.org"
+    }
+  ],
+  "require": {
+    "slim/slim": "2.6.2"
+  }
+}
