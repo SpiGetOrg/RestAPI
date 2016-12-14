@@ -14,7 +14,7 @@ $app->hook("slim.before", function () use ($app) {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Expose-Headers: Content-Type, Content-Length, Location, X-Api-Time, X-Page-Sort, X-Page-Order, X-Page-Size, X-Max-Page-Size, X-Page-Index, X-Page-Count");
     if (!in_array($_SERVER["REQUEST_METHOD"], $GLOBALS["ALLOWED_METHODS"])) {
-        header("Access-Control-Allow-Methods: " + implode(', ', $GLOBALS["ALLOWED_METHODS"]));
+        header("Access-Control-Allow-Methods: " . implode(', ', $GLOBALS["ALLOWED_METHODS"]));
         header("Access-Control-Request-Headers: X-Requested-With, Accept, Content-Type, Origin");
         header("Access-Control-Allow-Headers: Spiget-User-Agent");
         exit;
