@@ -1,5 +1,6 @@
 <?php
-function db() {
+function db()
+{
     extract(json_decode(file_get_contents("../../internal/mongo-v2.json"), true));
     $auth = "";
     if (!is_null($login['user']) && !is_null($login['pass'])) {
@@ -107,6 +108,3 @@ function webhooks()
     $db = db();
     return $db->webhooks;
 }
-
-
-?>

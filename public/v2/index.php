@@ -947,5 +947,3 @@ $app->group("/metrics", function () use ($app) {
 
 // Run!
 $app->run();
-
-?>

@@ -33,20 +33,20 @@ function paginate($app, $cursor)
 
 function selectFields($allowed, $request, $default = null)
 {
-	// enforce default or default down to allowed
+    // enforce default or default down to allowed
     $paramFields = strtolower(trim());
     if (is_null($request->params("fields"))) {
-    	if (is_null($default)) {
-    		return $allowed;
-    	}
-    	return $default;
+        if (is_null($default)) {
+            return $allowed;
+        }
+        return $default;
     }
     // split by comma, remove all whitespace, cast to lower case
-    $fields = array_map(function($input){
-	    return trim(strtolower($input));
-	}, explode(',', $request->params("fields")));
+    $fields = array_map(function ($input) {
+        return trim(strtolower($input));
+    }, explode(',', $request->params("fields")));
 
-	// return all keys which intersect with the allowed list
+    // return all keys which intersect with the allowed list
     return array_intersect($allowed, $fields);
 }
 
@@ -169,5 +169,3 @@ function getSpigotStatus()
         return false;
     }
 }
-
-?>
