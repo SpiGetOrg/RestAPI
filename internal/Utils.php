@@ -31,23 +31,32 @@ function paginate($app, $cursor)
     return $cursor->skip($size * ($page - 1))->limit($size)->sort(array($sort => $sortMode));
 }
 
+
 function selectFields($allowed, $request, $default = null)
 {
-    // enforce default or default down to allowed
-    $paramFields = strtolower(trim());
-    if (is_null($request->params("fields"))) {
-        if (is_null($default)) {
+    $paramFields = $request->params("fields");
+    if (!isset($paramFields)) {
+        if (!is_null($default)) {
+            return $default;
+        } else {
             return $allowed;
         }
-        return $default;
+    } else {
+        $paramFields = preg_split("/\\,/i", $paramFields);
     }
-    // split by comma, remove all whitespace, cast to lower case
-    $fields = array_map(function ($input) {
-        return trim(strtolower($input));
-    }, explode(',', $request->params("fields")));
-
-    // return all keys which intersect with the allowed list
-    return array_intersect($allowed, $fields);
+    $fields = $allowed;
+    foreach ($allowed as $field) {
+        if ("_id" === $field) {
+            continue;
+        } else {
+            if (!in_array($field, $paramFields)) {
+                if (($key = array_search($field, $fields)) !== false) {
+                    unset($fields[$key]);
+                }
+            }
+        }
+    }
+    return $fields;
 }
 
 
