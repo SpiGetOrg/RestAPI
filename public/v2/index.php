@@ -70,7 +70,11 @@ $app->get("/", function () use ($app) {
 });
 
 $app->get("/status", function () use ($app) {
+    $serverConfig = getServerConfig();
     $status = array(
+        "server" => array(
+            "name" => $serverConfig["server"]["name"]
+        ),
         "fetch" => array(
             "start" => getStatus("fetch.start"),
             "end" => getStatus("fetch.end"),

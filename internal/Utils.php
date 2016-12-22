@@ -178,3 +178,10 @@ function getSpigotStatus()
         return false;
     }
 }
+
+function getServerConfig()
+{
+    $config = json_decode(file_get_contents("../../internal/config.json"), true);
+
+    return $config;
+}
