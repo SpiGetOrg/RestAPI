@@ -73,7 +73,8 @@ $app->get("/status", function () use ($app) {
     $serverConfig = getServerConfig();
     $status = array(
         "server" => array(
-            "name" => $serverConfig["server"]["name"]
+            "name" => $serverConfig["server"]["name"],
+            "mode" => $serverConfig["server"]["mode"]
         ),
         "fetch" => array(
             "start" => getStatus("fetch.start"),

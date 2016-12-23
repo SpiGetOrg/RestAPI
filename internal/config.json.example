@@ -1,5 +1,6 @@
 {
   "server": {
-    "name": ""
+    "name": "",
+    "mode": "master/slave"
   }
 }

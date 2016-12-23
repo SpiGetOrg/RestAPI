@@ -183,5 +183,8 @@ function getServerConfig()
 {
     $config = json_decode(file_get_contents("../../internal/config.json"), true);
 
+    $config["isMaster"] = $config["server"]["mode"] === "master";
+    $config["isSlave"] = $config["server"]["mode"] === "slave";
+
     return $config;
 }
