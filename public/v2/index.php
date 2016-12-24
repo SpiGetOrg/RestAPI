@@ -888,66 +888,6 @@ $app->group("/metrics", function () use ($app) {
         echoData($json);
     })->name("/metrics/requests");
 
-    $app->get("/map/:days", function ($days) use ($app) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
-        $minTime = strtotime("00:00:00 GMT" . $days . " days ago");
-        if ($minTime === false) {
-            echoData(array("error" => "invalid time frame"), 400);
-            exit ();
-        }
-
-        $cursor = requests()->find(array("day" => array('$gt' => $minTime)));
-        if ($cursor->count() <= 0) {
-            echoData(array("error" => "invalid time frame"), 400);
-            return;
-        }
-
-        $ips = array();
-        foreach ($cursor as $doc) {
-            if (!in_array($doc["ip"], $ips)) {
-                $ips[] = $doc["ip"];
-            }
-        }
-
-        try {
-            $ch = curl_init("http://ip2nation.inventivetalent.org");
-            curl_setopt($ch, CURLOPT_HEADER, "User-Agent: " . $_SERVER["HTTP_USER_AGENT"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, 2);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, "query=" . json_encode($ips) . "&associative=true");
-
-            $result = curl_exec($ch);
-            curl_close($ch);
-
-            $countryMap = json_decode($result, true);
-        } catch (Exception $e) {
-            echoData(array("error" => "Failed to connect to IP database"));
-            return;
-        }
-
-        $data = array();
-        foreach ($cursor as $doc) {
-            $ip = $doc["ip"];
-            $count = $doc["count"];
-            $country = $countryMap[$ip];
-            if (is_null($country)) {
-                continue;
-            }
-
-            if (!isset($data[$country])) {
-                $data[$country] = array("code" => $country, "value" => $count);
-            } else {
-                $data[$country]["value"] += $count;
-            }
-        }
-
-        $data = array_values($data);
-        echoData($data);
-    })->name("/metrics/map");
-
 });
 
 
