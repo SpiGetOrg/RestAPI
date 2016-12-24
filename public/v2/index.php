@@ -710,6 +710,11 @@ $app->group("/webhook", function () use ($app) {
     })->name("/webhook/events");
 
     $app->post("/register", function () use ($app) {
+        if (getServerConfig()["isSlave"]) {
+            echoData(array("error" => "Webhook modification is not supported on this API server"), 400);
+            return;
+        }
+
         $url = $app->request()->post("url");
         $events = $app->request()->post("events", "[]");
         $events = json_decode($events, true);
@@ -788,6 +793,11 @@ $app->group("/webhook", function () use ($app) {
 
 
     $app->delete("/delete/:id/:secret", function ($id, $secret) use ($app) {
+        if (getServerConfig()["isSlave"]) {
+            echoData(array("error" => "Webhook modification is not supported on this API server"), 400);
+            return;
+        }
+
         $webhooks = webhooks();
 
         // Check if the ID exists first
