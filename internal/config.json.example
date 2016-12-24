@@ -2,5 +2,13 @@
   "server": {
     "name": "",
     "mode": "master/slave"
-  }
+  },
+  "logDownload": {
+      "fileFormat": "/var/log/spiget/access.log-%s.gz",
+      "ipWhitelist": [
+        "127.0.0.1"
+      ],
+      "token": "12345",
+      "pass": "12345"
+    }
 }
