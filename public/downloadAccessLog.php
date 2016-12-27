@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set("UTC");
+
 // Config
 $serverConfig = json_decode(file_get_contents("../internal/config.json"), true);
 
@@ -26,7 +28,7 @@ if ($pass !== $authPass) {
 }
 
 // Check if file exists
-$date = date("Ymd");
+$date = date("Ymd", time());
 $file = sprintf($serverConfig["logDownload"]["fileFormat"], $date);
 
 if (!file_exists($file) || !is_file($file)) {

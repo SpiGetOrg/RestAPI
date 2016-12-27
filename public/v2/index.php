@@ -5,6 +5,8 @@ include("../../internal/Config.php");
 include("../../internal/Database.php");
 include("../../internal/Utils.php");
 
+date_default_timezone_set("UTC");
+
 $app = new Slim\Slim();
 $app->notFound(function () use ($app) {
     echoData(array("error" => "invalid route"));
