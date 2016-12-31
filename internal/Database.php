@@ -108,3 +108,9 @@ function webhooks()
     $db = db();
     return $db->webhooks;
 }
+
+function metrics()
+{
+    $db = db();
+    return $db->metrics;
+}
