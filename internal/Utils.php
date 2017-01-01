@@ -56,6 +56,8 @@ function selectFields($allowed, $request, $default = null)
             }
         }
     }
+    // Remove gaps in the array - http://stackoverflow.com/a/15763467/6257838
+    $fields = array_values(array_filter($fields));
     return $fields;
 }
 
