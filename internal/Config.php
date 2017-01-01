@@ -58,6 +58,26 @@ $GLOBALS["SPIGET_AUTHOR_ALL_FIELDS"] = [
     "icon"
 ];
 
+$GLOBALS["SPIGET_REVIEW_LIST_FIELDS"] = [
+    "_id",
+    "author",
+    "rating",
+    "message",
+    "responseMessage",
+    "version",
+    "date"
+];
+
+$GLOBALS["SPIGET_REVIEW_ALL_FIELDS"] = [
+    "_id",
+    "author",
+    "rating",
+    "message",
+    "responseMessage",
+    "version",
+    "date"
+];
+
 $GLOBALS["MAX_PAGE_SIZE"] = 15000;
 
 $GLOBALS["ALLOWED_METHODS"] = ["POST", "GET", "DELETE"];

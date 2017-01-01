@@ -609,7 +609,7 @@ $app->group("/categories", function () use ($app) {
 $app->group("/reviews", function () use ($app) {
 
     $app->get("/", function () use ($app) {
-        $cursor = paginate($app, resource_reviews()->find());
+        $cursor = paginate($app, resource_reviews()->find(array(), selectFields($GLOBALS["SPIGET_REVIEW_LIST_FIELDS"], $app->request())));
         $reviews = dbToJson($cursor, true);
 
         echoData($reviews);
@@ -634,7 +634,7 @@ $app->group("/reviews", function () use ($app) {
     })->name("/reviews/trends");
 
     $app->get("/:review", function ($review) use ($app) {
-        $cursor = resource_reviews()->find(array("_id" => (int)$review));
+        $cursor = resource_reviews()->find(array("_id" => (int)$review), selectFields($GLOBALS["SPIGET_REVIEW_ALL_FIELDS"], $app->request()));
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
             echoData(array("error" => "review not found"));
@@ -826,6 +826,46 @@ $app->group("/webhook", function () use ($app) {
 
 });
 $app->group("/metrics", function () use ($app) {
+
+    $app->get("/requests-new/:days", function ($days) use ($app) {
+        $minTime = strtotime("00:00:00 GMT" . $days . " days ago");
+        if ($minTime === false) {
+            echoData(array("error" => "invalid time frame"), 400);
+            exit ();
+        }
+
+        $cursor = metrics()->find(array("timestamp" => array('$gte' => $minTime)))->sort(array("timestamp" => 1));
+        if ($cursor->count() <= 0) {
+            echoData(array("error" => "could not find any data for the given time frame"), 400);
+            return;
+        }
+
+        $data = array();
+
+        foreach ($cursor as $item) {
+            $global = $item["global"];
+            $entry = array(
+                "timestamp" => $item["timestamp"],
+                "total" => $global["total"],
+                "unique" => $global["unique"],
+                "userAgents" => $global["userAgents"],
+                "paths" => $global["paths"]
+            );
+
+            asort($entry["userAgents"]);
+            asort($entry["paths"]);
+
+            $data[] = $entry;
+        }
+
+        usort($data, function ($a, $b) {
+            if ($a["timestamp"] === $b["timestamp"]) {
+                return 0;
+            };
+            return ($a["timestamp"] < $b["timestamp"]) ? -1 : 1;
+        });
+        echoData($data);
+    })->name("/metrics/requests");
 
     $app->get("/requests/:days", function ($days) use ($app) {
         $minTime = strtotime("00:00:00 GMT" . $days . " days ago");
