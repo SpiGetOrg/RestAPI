@@ -874,7 +874,7 @@ $app->group("/metrics", function () use ($app) {
             exit ();
         }
 
-        $cursor = metrics()->find(array("timestamp" => array('$gte' => $minTime)));
+        $cursor = metrics()->find(array("timestamp" => array('$gte' => $minTime)))->sort(array("timestamp" => 1));
         if ($cursor->count() <= 0) {
             echoData(array("error" => "could not find any data for the given time frame"), 400);
             return;
@@ -884,15 +884,26 @@ $app->group("/metrics", function () use ($app) {
 
         foreach ($cursor as $item) {
             $global = $item["global"];
-            $data[] = array(
+            $entry = array(
                 "timestamp" => $item["timestamp"],
                 "total" => $global["total"],
                 "unique" => $global["unique"],
                 "userAgents" => $global["userAgents"],
                 "paths" => $global["paths"]
             );
+
+            asort($entry["userAgents"]);
+            asort($entry["paths"]);
+
+            $data[] = $entry;
         }
 
+        usort($data, function ($a, $b) {
+            if ($a["timestamp"] === $b["timestamp"]) {
+                return 0;
+            };
+            return ($a["timestamp"] < $b["timestamp"]) ? -1 : 1;
+        });
         echoData($data);
     })->name("/metrics/requests");
 
