@@ -10,6 +10,7 @@ function db()
         $mongo = new MongoClient ('mongodb://' . $auth . $host . ':' . $port . '/' . $login['db']);
         $db = $mongo->selectDB($database);
     } catch (Exception $e) {
+        http_response_code(500);
         exit("Database connection failed");
     }
     return $db;
@@ -107,4 +108,10 @@ function webhooks()
 {
     $db = db();
     return $db->webhooks;
+}
+
+function metrics()
+{
+    $db = db();
+    return $db->metrics;
 }
