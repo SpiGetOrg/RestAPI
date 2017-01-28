@@ -833,71 +833,32 @@ $app->group("/metrics", function () use ($app) {
             echoData(array("error" => "invalid time frame"), 400);
             exit ();
         }
-
-        $cursor = requests()->find(array("day" => array('$gt' => $minTime)));
+        $cursor = metrics()->find(array("timestamp" => array('$gte' => $minTime)))->sort(array("timestamp" => 1));
         if ($cursor->count() <= 0) {
-            echoData(array("error" => "invalid time frame"), 400);
+            echoData(array("error" => "could not find any data for the given time frame"), 400);
             return;
         }
-
-        $hourly = !is_null($app->request()->params("hourly"));
-        $fullVersions = !is_null($app->request()->params("fullVersions"));
-
-
-        $versionRegex = array(
-            "/^(.*)(\\/)([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer with slash
-            "/^(.*)([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$/",// SemVer without slash
-            "/^(Java)\\/(.*)$/",// Java
-            "/^(ViaVersion) (.*)$/"// ViaVersion
-        );
-
-        $json = array();
+        $data = array();
         foreach ($cursor as $item) {
-            $day = $item["day"];
-            $ua = $item["ua"];
-            $path = $item["path"];
-            $count = $item["count"];
-
-            if ($hourly) {
-                $day = $day + (3600 * $item["hour"]);
-            }
-
-            if (!$fullVersions) {
-                foreach ($versionRegex as $regex) {
-                    if (preg_match($regex, $ua, $matches)) {
-                        $ua = trim($matches[1]);
-                    }
-                }
-
-                //TODO: remove this eventually (maybe)
-                if (strpos($ua, "Java") === 0) {
-                    $ua .= " #LazyDev";
-                }
-            }
-
-            if (!isset($json["$day"])) {
-                $json["$day"] = array(
-                    "total" => 0,
-                    "user_agents" => array(),
-                    "methods" => array()
-                );
-            }
-            if (!isset($json["$day"]["user_agents"]["$ua"])) {
-                $json["$day"]["user_agents"]["$ua"] = $count;
-            } else {
-                $json["$day"]["user_agents"]["$ua"] += $count;
-            }
-            if (!isset($json["$day"]["methods"]["$path"])) {
-                $json["$day"]["methods"]["$path"] = $count;
-            } else {
-                $json["$day"]["methods"]["$path"] += $count;
-            }
-
-            $json["$day"]["total"] += $count;
+            $global = $item["global"];
+            $entry = array(
+                "timestamp" => $item["timestamp"],
+                "total" => $global["total"],
+                "unique" => $global["unique"],
+                "userAgents" => $global["userAgents"],
+                "paths" => $global["paths"]
+            );
+            asort($entry["userAgents"]);
+            asort($entry["paths"]);
+            $data[] = $entry;
         }
-
-        ksort($json);
-        echoData($json);
+        usort($data, function ($a, $b) {
+            if ($a["timestamp"] === $b["timestamp"]) {
+                return 0;
+            };
+            return ($a["timestamp"] < $b["timestamp"]) ? -1 : 1;
+        });
+        echoData($data);
     })->name("/metrics/requests");
 
 });
