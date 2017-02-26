@@ -207,6 +207,7 @@ $app->group("/resources", function () use ($app) {
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
             header("Content-Type: image/png");
+            http_response_code(404);
             echo base64_decode($GLOBALS["NOT_FOUND_IMG_DATA"]);
             exit();
         }
@@ -504,6 +505,7 @@ $app->group("/authors", function () use ($app) {
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
             header("Content-Type: image/png");
+            http_response_code(404);
             echo base64_decode($GLOBALS["NOT_FOUND_IMG_DATA"]);
             exit();
         }
