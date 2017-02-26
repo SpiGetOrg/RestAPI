@@ -80,26 +80,26 @@ function makeDownloadFile($resource, $type = ".jar")
 function echoImage($app, $source, $type, $defaultData, $defaultUrl)
 {
     if ($type === "raw") {
-        if (empty($source["icon"]["data"])) {
+        if (is_null($source) || empty($source["icon"]["data"])) {
             echo $defaultData;
         } else {
             echo $source["icon"]["data"];
         }
     } else if ($type === "go") {
-        if (empty($source["icon"]["url"])) {
+        if (is_null($source) || empty($source["icon"]["url"])) {
             header("Location: " . $defaultUrl);
         } else {
             header("Location: https://spigotmc.org/" . $source["icon"]["url"]);
         }
     } else if ($type === "url") {
-        if (empty($source["icon"]["url"])) {
+        if (is_null($source) || empty($source["icon"]["url"])) {
             echo $defaultUrl;
         } else {
             echo "https://spigotmc.org/" . $source["icon"]["url"];
         }
     } else {
         header("Content-Type: image/jpeg");
-        if (empty($source["icon"]["data"])) {
+        if (is_null($source) || empty($source["icon"]["data"])) {
             echo base64_decode($defaultData);
         } else {
             echo base64_decode($source["icon"]["data"]);

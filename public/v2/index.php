@@ -208,7 +208,7 @@ $app->group("/resources", function () use ($app) {
         if ($cursor->count() <= 0) {
             header("Content-Type: image/png");
             http_response_code(404);
-            echo base64_decode($GLOBALS["NOT_FOUND_IMG_DATA"]);
+            echoImage($app, null, $type, $GLOBALS["NOT_FOUND_IMG_DATA"], $GLOBALS["NOT_FOUND_IMG_URL"]);
             exit();
         }
         $resource = dbToJson($cursor);
@@ -506,7 +506,7 @@ $app->group("/authors", function () use ($app) {
         if ($cursor->count() <= 0) {
             header("Content-Type: image/png");
             http_response_code(404);
-            echo base64_decode($GLOBALS["NOT_FOUND_IMG_DATA"]);
+            echoImage($app, null, $type, $GLOBALS["NOT_FOUND_IMG_DATA"], $GLOBALS["NOT_FOUND_IMG_URL"]);
             exit();
         }
         $author = dbToJson($cursor);
