@@ -4,7 +4,7 @@
 	"database": "test",
 	"login": {
 		"user": null,
-		"password": null
+		"password": null,
 		"db": ""
 	}
 }
