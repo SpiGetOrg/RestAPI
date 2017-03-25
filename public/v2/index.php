@@ -207,13 +207,12 @@ $app->group("/resources", function () use ($app) {
         $cursor->limit(1);
         if ($cursor->count() <= 0) {
             header("Content-Type: image/png");
-            http_response_code(404);
             echoImage($app, null, $type, $GLOBALS["NOT_FOUND_IMG_DATA"], $GLOBALS["NOT_FOUND_IMG_URL"]);
             exit();
         }
         $resource = dbToJson($cursor);
 
-        echoImage($app, $resource, $type, $GLOBALS["DEFAULT_ICON_DATA"], $GLOBALS["DEFAULT_ICON_URL"]);
+        echoImage($app, $resource, $type, $GLOBALS["NOT_FOUND_IMG_DATA"], $GLOBALS["NOT_FOUND_IMG_URL"]);
         exit();
     })->name("/resources/x/icon");
 
@@ -511,7 +510,7 @@ $app->group("/authors", function () use ($app) {
         }
         $author = dbToJson($cursor);
 
-        echoImage($app, $author, $type, $GLOBALS["DEFAULT_AVATAR_DATA"], $GLOBALS["DEFAULT_AVATAR_URL"]);
+        echoImage($app, $author, $type, $GLOBALS["NOT_FOUND_IMG_DATA"], $GLOBALS["NOT_FOUND_IMG_URL"]);
         exit();
     });
 

@@ -81,18 +81,24 @@ function echoImage($app, $source, $type, $defaultData, $defaultUrl)
 {
     if ($type === "raw") {
         if (is_null($source) || empty($source["icon"]["data"])) {
+            $app->response->setStatus(404);
+            http_response_code(404);
             echo $defaultData;
         } else {
             echo $source["icon"]["data"];
         }
     } else if ($type === "go") {
         if (is_null($source) || empty($source["icon"]["url"])) {
+            $app->response->setStatus(404);
+            http_response_code(404);
             header("Location: " . $defaultUrl);
         } else {
             header("Location: https://spigotmc.org/" . $source["icon"]["url"]);
         }
     } else if ($type === "url") {
         if (is_null($source) || empty($source["icon"]["url"])) {
+            $app->response->setStatus(404);
+            http_response_code(404);
             echo $defaultUrl;
         } else {
             echo "https://spigotmc.org/" . $source["icon"]["url"];
@@ -100,6 +106,8 @@ function echoImage($app, $source, $type, $defaultData, $defaultUrl)
     } else {
         header("Content-Type: image/jpeg");
         if (is_null($source) || empty($source["icon"]["data"])) {
+            $app->response->setStatus(404);
+            http_response_code(404);
             echo base64_decode($defaultData);
         } else {
             echo base64_decode($source["icon"]["data"]);
