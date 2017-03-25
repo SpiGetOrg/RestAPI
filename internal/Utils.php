@@ -120,6 +120,7 @@ function echoData($json, $status = 0)
     $app = \Slim\Slim::getInstance();
 
     $app->response()->header("X-Api-Time", time());
+    $app->response()->header("X-Api-Server", getServerConfig()["server"]["name"]);
     $app->response()->header("Cache-Control", "public, max-age=3600, s-maxage=3600" /* 2 Hours Cache */);
     $app->response()->header("Expires", gmdate('D, d M Y H:i:s', strtotime('+1 hour')) . " GMT");
     $app->response()->header("Last-Modified", gmdate("D, d M Y H:i:s", (getStatus("fetch.start") / 1000)));
