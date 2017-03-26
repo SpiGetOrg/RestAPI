@@ -258,7 +258,11 @@ $app->group("/resources", function () use ($app) {
             }
             $cursor = resource_versions()->find(array('_id' => $highest));
         } else {
-            $cursor = resource_versions()->find(array("_id" => (int)$version));
+            if (is_int($version)) {
+                $cursor = resource_versions()->find(array("_id" => (int)$version));
+            } else {
+                $cursor = resource_versions()->find(array("name" => $version));
+            }
             if ($cursor->count() <= 0) {
                 echoData(array("error" => "resource version not found"), 404);
                 return;
@@ -292,7 +296,11 @@ $app->group("/resources", function () use ($app) {
             }
             $cursor = resource_versions()->find(array('_id' => $highest));
         } else {
-            $cursor = resource_versions()->find(array("_id" => (int)$version));
+            if (is_int($version)) {
+                $cursor = resource_versions()->find(array("_id" => (int)$version));
+            } else {
+                $cursor = resource_versions()->find(array("name" => $version));
+            }
             if ($cursor->count() <= 0) {
                 echoData(array("error" => "resource version not found"), 404);
                 return;
