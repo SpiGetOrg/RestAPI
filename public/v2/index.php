@@ -314,7 +314,7 @@ $app->group("/resources", function () use ($app) {
                 return;
             }
         }
-        $version = dbToJson($cursor, true);
+        $version = dbToJson($cursor, true)[0];
 
         echoData($version);
     })->name("/resources/x/versions/x");
