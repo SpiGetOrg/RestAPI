@@ -261,7 +261,11 @@ $app->group("/resources", function () use ($app) {
             if (is_int($version)) {
                 $cursor = resource_versions()->find(array("_id" => (int)$version));
             } else {
-                $cursor = resource_versions()->find(array("name" => $version));
+                $versionIds = array();
+                foreach ($resource["versions"] as $ver) {
+                    $versionIds[] = $ver["id"];
+                }
+                $cursor = resource_versions()->find(array("name" => $version, "_id" => array('$in' => $versionIds)));
             }
             if ($cursor->count() <= 0) {
                 echoData(array("error" => "resource version not found"), 404);
@@ -299,14 +303,18 @@ $app->group("/resources", function () use ($app) {
             if (is_int($version)) {
                 $cursor = resource_versions()->find(array("_id" => (int)$version));
             } else {
-                $cursor = resource_versions()->find(array("name" => $version));
+                $versionIds = array();
+                foreach ($resource["versions"] as $ver) {
+                    $versionIds[] = $ver["id"];
+                }
+                $cursor = resource_versions()->find(array("name" => $version, "_id" => array('$in' => $versionIds)));
             }
             if ($cursor->count() <= 0) {
                 echoData(array("error" => "resource version not found"), 404);
                 return;
             }
         }
-        $version = dbToJson($cursor);
+        $version = dbToJson($cursor, true);
 
         echoData($version);
     })->name("/resources/x/versions/x");
