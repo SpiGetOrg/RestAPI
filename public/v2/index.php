@@ -272,7 +272,7 @@ $app->group("/resources", function () use ($app) {
                 return;
             }
         }
-        $version = dbToJson($cursor);
+        $version = dbToJson($cursor, true)[0];
 
         header("Location: https://spigotmc.org/resources/" . $resource["id"] . "/download?version=" . $version["id"]);
     })->name("/resources/x/versions/x/download");
