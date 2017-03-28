@@ -258,7 +258,7 @@ $app->group("/resources", function () use ($app) {
             }
             $cursor = resource_versions()->find(array('_id' => $highest));
         } else {
-            if (is_int($version)) {
+            if (is_numeric($version) && is_int($version + 0)) {
                 $cursor = resource_versions()->find(array("_id" => (int)$version));
             } else {
                 $versionIds = array();
@@ -300,7 +300,8 @@ $app->group("/resources", function () use ($app) {
             }
             $cursor = resource_versions()->find(array('_id' => $highest));
         } else {
-            if (is_int($version)) {
+            // There should really be an easier way to do this...
+            if (is_numeric($version) && is_int($version + 0)) {
                 $cursor = resource_versions()->find(array("_id" => (int)$version));
             } else {
                 $versionIds = array();
