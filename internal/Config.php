@@ -18,6 +18,8 @@ $GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"] = [
     "downloads",
     "icon",
     "author",
+    "premium",
+
     "hidden"
 ];
 
@@ -43,6 +45,9 @@ $GLOBALS["SPIGET_RESOURCE_ALL_FIELDS"] = [
     "downloads",
     "icon",
     "reviews",
+    "premium",
+    "price",
+    "currency",
 
     "hidden"
 ];

@@ -148,6 +148,20 @@ $app->group("/resources", function () use ($app) {
         echoData($resources);
     })->name("/resources/recentUpdates");
 
+    $app->get("/premium", function () use ($app) {
+        $cursor = paginate($app, resources()->find(array("premium" => true), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor, true);
+
+        echoData($resources);
+    })->name("/resources/premium");
+
+    $app->get("/free", function () use ($app) {
+        $cursor = paginate($app, resources()->find(array("premium" => false), selectFields($GLOBALS["SPIGET_RESOURCE_LIST_FIELDS"], $app->request())));
+        $resources = dbToJson($cursor, true);
+
+        echoData($resources);
+    })->name("/resources/free");
+
     $app->get("/for/:versions", function ($versions = "") use ($app) {
         $method = $app->request()->params("method", "any");
         $versionArray = preg_split("/\\,/i", $versions);
