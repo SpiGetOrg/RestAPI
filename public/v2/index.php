@@ -26,10 +26,10 @@ $app->hook("slim.before", function () use ($app) {
 
 // request tracking middleware
 $app->hook("slim.before.dispatch", function () use ($app) {
-    $dontTrackMeHeader = $app->request()->headers("X-Do-Not-Track-Me", "false");
-    if ($dontTrackMeHeader === "true") {
-        $app->response()->header("X-Do-Not-Track-Me", "true");
-    } else {
+//    $dontTrackMeHeader = $app->request()->headers("X-Do-Not-Track-Me", "false");
+//    if ($dontTrackMeHeader === "true") {
+//        $app->response()->header("X-Do-Not-Track-Me", "true");
+//    } else {
 //        if ($app->response()->isSuccessful()) {
 //            $ua = !empty ($_SERVER ['HTTP_USER_AGENT']) ? $_SERVER ['HTTP_USER_AGENT'] : "unknown";
 //
@@ -64,7 +64,7 @@ $app->hook("slim.before.dispatch", function () use ($app) {
 //                "writeConcern" => 0
 //            ));
 //        }
-    }
+//    }
 });
 
 $app->get("/", function () use ($app) {
