@@ -263,14 +263,24 @@ $app->group("/resources", function () use ($app) {
         $resource = dbToJson($cursor);
 
         if ("latest" === $version) {
-            $highest = 0;
+            $ids = [];
             foreach ($resource["versions"] as $ver) {
-                $id = $ver["id"];
-                if ($id > $highest) {
-                    $highest = $id;
+                $ids[] = $ver["id"];
+            }
+            $cursor = resource_versions()->find(array("_id" => array('$in' => $ids)));
+            $versionObjs = dbToJson($cursor);
+
+            $latest = 0;
+            $latestVer = null;
+            foreach ($versionObjs as $ver) {
+                $releaseDate = $ver["releaseDate"];
+                if ($releaseDate > $latest) {
+                    $latest = $releaseDate;
+                    $latestVer = $ver["id"];
                 }
             }
-            $cursor = resource_versions()->find(array('_id' => $highest));
+
+            $cursor = resource_versions()->find(array('_id' => $latestVer));
         } else {
             if (is_numeric($version) && is_int($version + 0)) {
                 $cursor = resource_versions()->find(array("_id" => (int)$version));
@@ -305,14 +315,24 @@ $app->group("/resources", function () use ($app) {
         $resource = dbToJson($cursor);
 
         if ("latest" === $version) {
-            $highest = 0;
+            $ids = [];
             foreach ($resource["versions"] as $ver) {
-                $id = $ver["id"];
-                if ($id > $highest) {
-                    $highest = $id;
+                $ids[] = $ver["id"];
+            }
+            $cursor = resource_versions()->find(array("_id" => array('$in' => $ids)));
+            $versionObjs = dbToJson($cursor);
+
+            $latest = 0;
+            $latestVer = null;
+            foreach ($versionObjs as $ver) {
+                $releaseDate = $ver["releaseDate"];
+                if ($releaseDate > $latest) {
+                    $latest = $releaseDate;
+                    $latestVer = $ver["id"];
                 }
             }
-            $cursor = resource_versions()->find(array('_id' => $highest));
+
+            $cursor = resource_versions()->find(array('_id' => $latestVer));
         } else {
             // There should really be an easier way to do this...
             if (is_numeric($version) && is_int($version + 0)) {
@@ -371,14 +391,24 @@ $app->group("/resources", function () use ($app) {
         $resource = dbToJson($cursor);
 
         if ("latest" === $update) {
-            $highest = 0;
-            foreach ($resource["updates"] as $up) {
-                $id = $up["id"];
-                if ($id > $highest) {
-                    $highest = $id;
+            $ids = [];
+            foreach ($resource["versions"] as $ver) {
+                $ids[] = $ver["id"];
+            }
+            $cursor = resource_versions()->find(array("_id" => array('$in' => $ids)));
+            $versionObjs = dbToJson($cursor);
+
+            $latest = 0;
+            $latestVer = null;
+            foreach ($versionObjs as $ver) {
+                $releaseDate = $ver["releaseDate"];
+                if ($releaseDate > $latest) {
+                    $latest = $releaseDate;
+                    $latestVer = $ver["id"];
                 }
             }
-            $cursor = resource_updates()->find(array('_id' => $highest));
+
+            $cursor = resource_versions()->find(array('_id' => $latestVer));
         } else {
             $cursor = resource_updates()->find(array("_id" => (int)$update));
             if ($cursor->count() <= 0) {
